@@ -1,0 +1,252 @@
+# ════════════════════════════════════════════════════════════
+# script.ac_dashboard_tap
+# ════════════════════════════════════════════════════════════
+# Called from dashboard AC card tap_action.
+# Single entry point for all 17 units — pass room-specific
+# entity IDs as variables in the service call.
+#
+# Behavior:
+#   - On genset / grid unstable → refuse with notification
+#   - Inside automation window + mode=auto → simple toggle
+#   - Outside automation window (or mode=off) → enter quick cool
+#   - Already in quick_cool → cancel quick cool, revert to auto
+#
+# Dashboard card tap_action example:
+#   tap_action:
+#     action: call-service
+#     service: script.ac_dashboard_tap
+#     service_data:
+#       ac_switch: switch.ac_v1_raam
+#       ac_mode: input_select.ac_mode_v1_raam
+#       power_sensor: sensor.ac_v1_raam_power
+#       temp_sensor: sensor.temp_v1_raam_temperature
+#       humidity_sensor: sensor.temp_v1_raam_humidity
+#       start_time_helper: input_datetime.ac_start_time_v1_raam
+#       end_time_helper: input_datetime.ac_end_time_v1_raam
+#       power_source_sensor: sensor.villa_1_power_source
+#       grid_stable_boolean: input_boolean.grid_power_stable
+#       quick_cool_timer: timer.ac_quick_cool_v1_raam
+#       quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v1_raam
+#       quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v1_raam
+#       last_off_helper: input_datetime.ac_last_off_v1_raam
+#       room_name: "V1 Raam"
+
+ac_dashboard_tap:
+  alias: "AC Dashboard Tap"
+  description: "Smart AC toggle — handles genset block, quick cool, and normal toggle"
+  mode: single
+
+  fields:
+    ac_switch:
+      description: "AC switch entity"
+      selector:
+        entity:
+          domain: switch
+    ac_mode:
+      description: "AC mode input_select"
+      selector:
+        entity:
+          domain: input_select
+    power_sensor:
+      description: "P110 power sensor"
+      selector:
+        entity:
+          domain: sensor
+    temp_sensor:
+      description: "Temperature sensor (pass 'none' if unavailable)"
+      selector:
+        entity:
+          domain: sensor
+    humidity_sensor:
+      description: "Humidity sensor (pass 'none' if unavailable)"
+      selector:
+        entity:
+          domain: sensor
+    start_time_helper:
+      description: "Schedule start time helper"
+      selector:
+        entity:
+          domain: input_datetime
+    end_time_helper:
+      description: "Schedule end time helper"
+      selector:
+        entity:
+          domain: input_datetime
+    power_source_sensor:
+      description: "Power source sensor"
+      selector:
+        entity:
+          domain: sensor
+    grid_stable_boolean:
+      description: "Grid stable boolean"
+      selector:
+        entity:
+          domain: input_boolean
+    quick_cool_timer:
+      description: "Quick cool timer entity"
+      selector:
+        entity:
+          domain: timer
+    quick_cool_baseline_temp:
+      description: "Quick cool baseline temp input_number"
+      selector:
+        entity:
+          domain: input_number
+    quick_cool_baseline_humidity:
+      description: "Quick cool baseline humidity input_number"
+      selector:
+        entity:
+          domain: input_number
+    last_off_helper:
+      description: "Last off timestamp helper"
+      selector:
+        entity:
+          domain: input_datetime
+    room_name:
+      description: "Human-readable room name for notifications"
+      selector:
+        text:
+
+  variables:
+    power_source: "{{ states(power_source_sensor) | trim }}"
+    grid_stable: "{{ states(grid_stable_boolean) == 'on' }}"
+    on_genset: "{{ power_source in ['genset', 'panel_fault', 'no_power'] }}"
+    ac_on: "{{ states(power_sensor) | float(0) > 2 }}"
+    current_mode: "{{ states(ac_mode) | trim }}"
+
+    start_time_raw: "{{ states(start_time_helper) }}"
+    end_time_raw: "{{ states(end_time_helper) }}"
+    in_time_window: >
+      {% set now_t = now().time() %}
+      {% set s = strptime(start_time_raw, '%H:%M:%S').time() if ':' in start_time_raw else now_t %}
+      {% set e = strptime(end_time_raw, '%H:%M:%S').time() if ':' in end_time_raw else now_t %}
+      {{ (s < e and s <= now_t <= e) or (s > e and (now_t >= s or now_t <= e)) }}
+
+    temp_ok: >
+      {{ temp_sensor not in ['none', '', 'None']
+         and states(temp_sensor) not in ['unknown', 'unavailable', '']
+         and states(temp_sensor) | float(-999) > -900 }}
+    humidity_ok: >
+      {{ humidity_sensor not in ['none', '', 'None']
+         and states(humidity_sensor) not in ['unknown', 'unavailable', '']
+         and states(humidity_sensor) | float(-999) > -900 }}
+
+  sequence:
+    - choose:
+
+        # ── BLOCK: On genset or grid unstable ──────────────
+        - conditions:
+            - condition: template
+              value_template: "{{ on_genset or not grid_stable }}"
+          sequence:
+            - service: persistent_notification.create
+              data:
+                title: "⚡ AC Blocked"
+                message: >
+                  {{ room_name }}: Cannot turn on AC —
+                  {% if on_genset %}running on genset{% else %}grid stabilizing{% endif %}.
+                  AC will auto-restore when grid is stable.
+                notification_id: "ac_blocked_{{ ac_switch | replace('.', '_') }}"
+
+        # ── AC is currently ON → turn OFF (any mode) ──────
+        - conditions:
+            - condition: template
+              value_template: "{{ ac_on }}"
+          sequence:
+            - service: switch.turn_off
+              target:
+                entity_id: "{{ ac_switch }}"
+            - service: input_datetime.set_datetime
+              target:
+                entity_id: "{{ last_off_helper }}"
+              data:
+                datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+            # If in quick cool, cancel it
+            - choose:
+                - conditions:
+                    - condition: template
+                      value_template: "{{ current_mode == 'quick_cool' }}"
+                  sequence:
+                    - service: timer.cancel
+                      target:
+                        entity_id: "{{ quick_cool_timer }}"
+                    - service: input_select.select_option
+                      target:
+                        entity_id: "{{ ac_mode }}"
+                      data:
+                        option: "auto"
+
+        # ── AC is OFF + inside window + auto mode → simple ON
+        - conditions:
+            - condition: template
+              value_template: "{{ not ac_on and in_time_window and current_mode == 'auto' }}"
+          sequence:
+            - service: switch.turn_on
+              target:
+                entity_id: "{{ ac_switch }}"
+
+        # ── AC is OFF + outside window (or mode=off) → QUICK COOL
+        - conditions:
+            - condition: template
+              value_template: "{{ not ac_on and (not in_time_window or current_mode == 'off') }}"
+          sequence:
+            # Snapshot baseline temp
+            - choose:
+                - conditions:
+                    - condition: template
+                      value_template: "{{ temp_ok }}"
+                  sequence:
+                    - service: input_number.set_value
+                      target:
+                        entity_id: "{{ quick_cool_baseline_temp }}"
+                      data:
+                        value: "{{ states(temp_sensor) | float }}"
+              default:
+                - service: input_number.set_value
+                  target:
+                    entity_id: "{{ quick_cool_baseline_temp }}"
+                  data:
+                    value: 0
+            # Snapshot baseline humidity
+            - choose:
+                - conditions:
+                    - condition: template
+                      value_template: "{{ humidity_ok }}"
+                  sequence:
+                    - service: input_number.set_value
+                      target:
+                        entity_id: "{{ quick_cool_baseline_humidity }}"
+                      data:
+                        value: "{{ states(humidity_sensor) | float }}"
+              default:
+                - service: input_number.set_value
+                  target:
+                    entity_id: "{{ quick_cool_baseline_humidity }}"
+                  data:
+                    value: 0
+            # Set mode to quick_cool
+            - service: input_select.select_option
+              target:
+                entity_id: "{{ ac_mode }}"
+              data:
+                option: "quick_cool"
+            # Start timer
+            - service: timer.start
+              target:
+                entity_id: "{{ quick_cool_timer }}"
+              data:
+                duration: "{{ quick_cool_duration | default(3600) }}"
+            # Turn on AC
+            - service: switch.turn_on
+              target:
+                entity_id: "{{ ac_switch }}"
+            # Notify
+            - service: persistent_notification.create
+              data:
+                title: "❄️ Quick Cool Active"
+                message: >
+                  {{ room_name }}: Quick cool started.
+                  {% if temp_ok %}Baseline {{ states(temp_sensor) }}°C → target {{ [states(temp_sensor)|float - 4, 23] | max }}°C.{% endif %}
+                  {% if humidity_ok %}Humidity {{ states(humidity_sensor) }}% → target ≤30%.{% endif %}
+                  Auto-stops in 60 minutes or when targets reached.
+                notification_id: "ac_qc_{{ ac_switch | replace('.', '_') }}"

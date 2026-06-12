@@ -1,0 +1,114 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2868
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 alias: Borewell - Track Tank Usage Per 1 Percent Drop\
+description: >\
+  Logs every 1% drop in tank level when borewell is OFF. Uses strict floor-level\
+  tracking (only downward movement) to ignore sensor noise. No upward resets\
+  allowed \'97 floor resets only when borewell turns ON.\
+triggers:\
+  - entity_id: sensor.villas_tank_sensor_liquid_level_percent\
+    trigger: state\
+conditions:\
+  - condition: state\
+    entity_id: switch.borewell\
+    state: "off"\
+actions:\
+  - variables:\
+      raw_level: >-\
+        \{\{ states('sensor.villas_tank_sensor_liquid_level_percent') | float |\
+        round(2) \}\}\
+      floor_level: "\{\{ states('input_number.tank_floor_level') | float | round(2) \}\}"\
+      last_logged: "\{\{ states('input_number.tank_last_logged_level') | float | round(2) \}\}"\
+  - choose:\
+      - conditions:\
+          - condition: template\
+            value_template: "\{\{ raw_level < floor_level \}\}"\
+        sequence:\
+          - target:\
+              entity_id: input_number.tank_floor_level\
+            data:\
+              value: "\{\{ raw_level \}\}"\
+            action: input_number.set_value\
+  - variables:\
+      current_level: "\{\{ states('input_number.tank_floor_level') | float | round(2) \}\}"\
+  - choose:\
+      - conditions:\
+          - condition: template\
+            value_template: "\{\{ (last_logged - current_level) >= 1.0 \}\}"\
+        sequence:\
+          - variables:\
+              litres_remaining: "\{\{ (current_level * 50) | round(0) \}\}"\
+              litres_dropped: "\{\{ ((last_logged - current_level) * 50) | round(0) \}\}"\
+              last_drop_time_str: "\{\{ states('input_text.last_1pct_drop_time') \}\}"\
+              minutes_since_last_drop: |\
+                \{% if last_drop_time_str not in ['unknown','unavailable',''] %\}\
+                  \{\{ ((as_timestamp(now()) - as_timestamp(last_drop_time_str)) / 60) | round(1) \}\}\
+                \{% else %\}\
+                  999\
+                \{% endif %\}\
+              total_dropped_since_fill: >\
+                \{\{ (states('input_number.tank_level_at_last_fill') | float -\
+                current_level) | round(1) \}\}\
+          - target:\
+              entity_id: input_number.tank_last_logged_level\
+            data:\
+              value: "\{\{ current_level \}\}"\
+            action: input_number.set_value\
+          - target:\
+              entity_id: input_text.last_1pct_drop_time\
+            data:\
+              value: "\{\{ now().strftime('%Y-%m-%d %H:%M:%S') \}\}"\
+            action: input_text.set_value\
+          - continue_on_error: true\
+            data:\
+              date: "\{\{ now().strftime('%Y-%m-%d') \}\}"\
+              time: "\{\{ now().strftime('%H:%M:%S') \}\}"\
+              event_type: 1% drop\
+              tank_level_percent: "\{\{ current_level \}\}"\
+              litres_remaining: "\{\{ litres_remaining \}\}"\
+              litres_dropped: "\{\{ litres_dropped \}\}"\
+              borewell_state: "off"\
+            action: rest_command.log_borewell_usage\
+          - choose:\
+              - conditions:\
+                  - condition: template\
+                    value_template: |\
+                      \{\{ total_dropped_since_fill >= 10 and\
+                         minutes_since_last_drop | float <= 30 \}\}\
+                sequence:\
+                  - data:\
+                      title: \uc0\u55357 \u56448  Possible Tank Leak Detected\
+                      message: >\
+                        Tank has dropped \{\{ total_dropped_since_fill \}\}% since\
+                        last fill. Last 1% drop took only \{\{\
+                        minutes_since_last_drop \}\} mins. Currently at \{\{\
+                        current_level \}\}% (\{\{ litres_remaining \}\}L remaining).\
+                        Check for leaks or burst pipe.\
+                    action: notify.mobile_app_devs_nord5\
+                  - data:\
+                      title: \uc0\u55357 \u56448  Possible Tank Leak Detected\
+                      message: >\
+                        Tank has dropped \{\{ total_dropped_since_fill \}\}% since\
+                        last fill. Last 1% drop took only \{\{\
+                        minutes_since_last_drop \}\} mins. Currently at \{\{\
+                        current_level \}\}% (\{\{ litres_remaining \}\}L remaining).\
+                        Check for leaks or burst pipe.\
+                    action: notify.mobile_app_devs_iphone\
+                  - data:\
+                      title: \uc0\u55357 \u56448  Possible Tank Leak Detected\
+                      message: >\
+                        Tank has dropped \{\{ total_dropped_since_fill \}\}% since\
+                        last fill. Last 1% drop took only \{\{\
+                        minutes_since_last_drop \}\} mins. Currently at \{\{\
+                        current_level \}\}% (\{\{ litres_remaining \}\}L remaining).\
+                        Check for leaks or burst pipe.\
+                      notification_id: tank_leak_alert\
+                    action: persistent_notification.create\
+mode: single\
+max_exceeded: silent\
+}

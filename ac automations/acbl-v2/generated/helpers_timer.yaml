@@ -1,0 +1,103 @@
+# ACBL v2 — Quick cool timers
+timer:
+  ac_quick_cool_v1_master:
+    name: "Quick Cool Timer — V1 Master"
+    duration: '01:00:00'
+    restore: true
+    icon: mdi:snowflake-alert
+
+  ac_quick_cool_v1_raam:
+    name: "Quick Cool Timer — V1 Raam"
+    duration: '01:00:00'
+    restore: true
+    icon: mdi:snowflake-alert
+
+  ac_quick_cool_v1_radhha:
+    name: "Quick Cool Timer — V1 Radhha"
+    duration: '01:00:00'
+    restore: true
+    icon: mdi:snowflake-alert
+
+  ac_quick_cool_v1_yoga:
+    name: "Quick Cool Timer — V1 Yoga"
+    duration: '01:00:00'
+    restore: true
+    icon: mdi:snowflake-alert
+
+  ac_quick_cool_v2_study:
+    name: "Quick Cool Timer — V2 Study"
+    duration: '01:00:00'
+    restore: true
+    icon: mdi:snowflake-alert
+
+  ac_quick_cool_v2_sk:
+    name: "Quick Cool Timer — V2 SK"
+    duration: '01:00:00'
+    restore: true
+    icon: mdi:snowflake-alert
+
+  ac_quick_cool_v2_ck:
+    name: "Quick Cool Timer — V2 CK"
+    duration: '01:00:00'
+    restore: true
+    icon: mdi:snowflake-alert
+
+  ac_quick_cool_v3_master:
+    name: "Quick Cool Timer — V3 Master"
+    duration: '01:00:00'
+    restore: true
+    icon: mdi:snowflake-alert
+
+  ac_quick_cool_v3_vrajraj:
+    name: "Quick Cool Timer — V3 Vrajraj"
+    duration: '01:00:00'
+    restore: true
+    icon: mdi:snowflake-alert
+
+  ac_quick_cool_v3_dhaani:
+    name: "Quick Cool Timer — V3 Dhaani"
+    duration: '01:00:00'
+    restore: true
+    icon: mdi:snowflake-alert
+
+  ac_quick_cool_v3_office:
+    name: "Quick Cool Timer — V3 Office"
+    duration: '01:00:00'
+    restore: true
+    icon: mdi:snowflake-alert
+
+  ac_quick_cool_v4_dining_1:
+    name: "Quick Cool Timer — V4 Dining 1"
+    duration: '01:00:00'
+    restore: true
+    icon: mdi:snowflake-alert
+
+  ac_quick_cool_v4_dining_2:
+    name: "Quick Cool Timer — V4 Dining 2"
+    duration: '01:00:00'
+    restore: true
+    icon: mdi:snowflake-alert
+
+  ac_quick_cool_v4_living_1:
+    name: "Quick Cool Timer — V4 Living 1"
+    duration: '01:00:00'
+    restore: true
+    icon: mdi:snowflake-alert
+
+  ac_quick_cool_v4_living_2:
+    name: "Quick Cool Timer — V4 Living 2"
+    duration: '01:00:00'
+    restore: true
+    icon: mdi:snowflake-alert
+
+  ac_quick_cool_v4_guest:
+    name: "Quick Cool Timer — V4 Guest"
+    duration: '01:00:00'
+    restore: true
+    icon: mdi:snowflake-alert
+
+  ac_quick_cool_v5_mandir:
+    name: "Quick Cool Timer — V5 Mandir"
+    duration: '01:00:00'
+    restore: true
+    icon: mdi:snowflake-alert

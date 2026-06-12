@@ -1,0 +1,392 @@
+# ACBL v2 — Blueprint automation instances for all 17 units
+automation:
+  - alias: "ACBL-V1-Master"
+    description: "ACBL v2 automation for V1 Master"
+    use_blueprint:
+      path: AC/acbl-v2.yaml
+      input:
+        ac_switch: switch.ac_v1_master
+        power_sensor: sensor.ac_v1_master_power
+        ac_mode: input_select.ac_mode_v1_master
+        temperature_sensor: "sensor.homenode_sense_temp_v1_master_bme280_temperature"
+        humidity_sensor: "sensor.homenode_sense_temp_v1_master_bme280_humidity"
+        power_source_sensor: sensor.villa_1_power_source
+        grid_stable_boolean: input_boolean.grid_power_stable
+        pre_outage_state: input_boolean.ac_pre_outage_v1_master
+        target_temp_helper: input_number.ac_target_temp_v1_master
+        high_temp_helper: input_number.ac_high_temp_v1_master
+        start_time_helper: input_datetime.ac_start_time_v1_master
+        end_time_helper: input_datetime.ac_end_time_v1_master
+        last_off_helper: input_datetime.ac_last_off_v1_master
+        min_off_helper: input_number.ac_min_off_v1_master
+        quick_cool_timer: timer.ac_quick_cool_v1_master
+        quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v1_master
+        quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v1_master
+
+  - alias: "ACBL-V1-Raam"
+    description: "ACBL v2 automation for V1 Raam"
+    use_blueprint:
+      path: AC/acbl-v2.yaml
+      input:
+        ac_switch: switch.ac_v1_raam
+        power_sensor: sensor.ac_v1_raam_power
+        ac_mode: input_select.ac_mode_v1_raam
+        temperature_sensor: "sensor.temp_v1_raam_temperature"
+        humidity_sensor: "sensor.temp_v1_raam_humidity"
+        power_source_sensor: sensor.villa_1_power_source
+        grid_stable_boolean: input_boolean.grid_power_stable
+        pre_outage_state: input_boolean.ac_pre_outage_v1_raam
+        target_temp_helper: input_number.ac_target_temp_v1_raam
+        high_temp_helper: input_number.ac_high_temp_v1_raam
+        start_time_helper: input_datetime.ac_start_time_v1_raam
+        end_time_helper: input_datetime.ac_end_time_v1_raam
+        last_off_helper: input_datetime.ac_last_off_v1_raam
+        min_off_helper: input_number.ac_min_off_v1_raam
+        quick_cool_timer: timer.ac_quick_cool_v1_raam
+        quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v1_raam
+        quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v1_raam
+
+  - alias: "ACBL-V1-Radhha"
+    description: "ACBL v2 automation for V1 Radhha"
+    use_blueprint:
+      path: AC/acbl-v2.yaml
+      input:
+        ac_switch: switch.ac_v1_radhha
+        power_sensor: sensor.ac_v1_radhha_power
+        ac_mode: input_select.ac_mode_v1_radhha
+        temperature_sensor: "sensor.temp_v1_radhha_zb_temperature"
+        humidity_sensor: "sensor.temp_v1_radhha_zb_humidity"
+        power_source_sensor: sensor.villa_1_power_source
+        grid_stable_boolean: input_boolean.grid_power_stable
+        pre_outage_state: input_boolean.ac_pre_outage_v1_radhha
+        target_temp_helper: input_number.ac_target_temp_v1_radhha
+        high_temp_helper: input_number.ac_high_temp_v1_radhha
+        start_time_helper: input_datetime.ac_start_time_v1_radhha
+        end_time_helper: input_datetime.ac_end_time_v1_radhha
+        last_off_helper: input_datetime.ac_last_off_v1_radhha
+        min_off_helper: input_number.ac_min_off_v1_radhha
+        quick_cool_timer: timer.ac_quick_cool_v1_radhha
+        quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v1_radhha
+        quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v1_radhha
+
+  - alias: "ACBL-V1-Yoga"
+    description: "ACBL v2 automation for V1 Yoga"
+    use_blueprint:
+      path: AC/acbl-v2.yaml
+      input:
+        ac_switch: switch.ac_v1_yoga
+        power_sensor: sensor.ac_v1_yoga_power
+        ac_mode: input_select.ac_mode_v1_yoga
+        temperature_sensor: "none"
+        humidity_sensor: "none"
+        power_source_sensor: sensor.villa_1_power_source
+        grid_stable_boolean: input_boolean.grid_power_stable
+        pre_outage_state: input_boolean.ac_pre_outage_v1_yoga
+        target_temp_helper: input_number.ac_target_temp_v1_yoga
+        high_temp_helper: input_number.ac_high_temp_v1_yoga
+        start_time_helper: input_datetime.ac_start_time_v1_yoga
+        end_time_helper: input_datetime.ac_end_time_v1_yoga
+        last_off_helper: input_datetime.ac_last_off_v1_yoga
+        min_off_helper: input_number.ac_min_off_v1_yoga
+        quick_cool_timer: timer.ac_quick_cool_v1_yoga
+        quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v1_yoga
+        quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v1_yoga
+
+  - alias: "ACBL-V2-Study"
+    description: "ACBL v2 automation for V2 Study"
+    use_blueprint:
+      path: AC/acbl-v2.yaml
+      input:
+        ac_switch: switch.ac_v2_study
+        power_sensor: sensor.ac_v2_study_power
+        ac_mode: input_select.ac_mode_v2_study
+        temperature_sensor: "none"
+        humidity_sensor: "none"
+        power_source_sensor: sensor.villa_1_power_source
+        grid_stable_boolean: input_boolean.grid_power_stable
+        pre_outage_state: input_boolean.ac_pre_outage_v2_study
+        target_temp_helper: input_number.ac_target_temp_v2_study
+        high_temp_helper: input_number.ac_high_temp_v2_study
+        start_time_helper: input_datetime.ac_start_time_v2_study
+        end_time_helper: input_datetime.ac_end_time_v2_study
+        last_off_helper: input_datetime.ac_last_off_v2_study
+        min_off_helper: input_number.ac_min_off_v2_study
+        quick_cool_timer: timer.ac_quick_cool_v2_study
+        quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v2_study
+        quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v2_study
+
+  - alias: "ACBL-V2-SK"
+    description: "ACBL v2 automation for V2 SK"
+    use_blueprint:
+      path: AC/acbl-v2.yaml
+      input:
+        ac_switch: switch.ac_v2_sk
+        power_sensor: sensor.ac_v2_sk_power
+        ac_mode: input_select.ac_mode_v2_sk
+        temperature_sensor: "none"
+        humidity_sensor: "none"
+        power_source_sensor: sensor.villa_1_power_source
+        grid_stable_boolean: input_boolean.grid_power_stable
+        pre_outage_state: input_boolean.ac_pre_outage_v2_sk
+        target_temp_helper: input_number.ac_target_temp_v2_sk
+        high_temp_helper: input_number.ac_high_temp_v2_sk
+        start_time_helper: input_datetime.ac_start_time_v2_sk
+        end_time_helper: input_datetime.ac_end_time_v2_sk
+        last_off_helper: input_datetime.ac_last_off_v2_sk
+        min_off_helper: input_number.ac_min_off_v2_sk
+        quick_cool_timer: timer.ac_quick_cool_v2_sk
+        quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v2_sk
+        quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v2_sk
+
+  - alias: "ACBL-V2-CK"
+    description: "ACBL v2 automation for V2 CK"
+    use_blueprint:
+      path: AC/acbl-v2.yaml
+      input:
+        ac_switch: switch.ac_v2_ck
+        power_sensor: sensor.ac_v2_ck_power
+        ac_mode: input_select.ac_mode_v2_ck
+        temperature_sensor: "none"
+        humidity_sensor: "none"
+        power_source_sensor: sensor.villa_1_power_source
+        grid_stable_boolean: input_boolean.grid_power_stable
+        pre_outage_state: input_boolean.ac_pre_outage_v2_ck
+        target_temp_helper: input_number.ac_target_temp_v2_ck
+        high_temp_helper: input_number.ac_high_temp_v2_ck
+        start_time_helper: input_datetime.ac_start_time_v2_ck
+        end_time_helper: input_datetime.ac_end_time_v2_ck
+        last_off_helper: input_datetime.ac_last_off_v2_ck
+        min_off_helper: input_number.ac_min_off_v2_ck
+        quick_cool_timer: timer.ac_quick_cool_v2_ck
+        quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v2_ck
+        quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v2_ck
+
+  - alias: "ACBL-V3-Master"
+    description: "ACBL v2 automation for V3 Master"
+    use_blueprint:
+      path: AC/acbl-v2.yaml
+      input:
+        ac_switch: switch.ac_v3_master
+        power_sensor: sensor.ac_v3_master_power
+        ac_mode: input_select.ac_mode_v3_master
+        temperature_sensor: "none"
+        humidity_sensor: "none"
+        power_source_sensor: sensor.villa_1_power_source
+        grid_stable_boolean: input_boolean.grid_power_stable
+        pre_outage_state: input_boolean.ac_pre_outage_v3_master
+        target_temp_helper: input_number.ac_target_temp_v3_master
+        high_temp_helper: input_number.ac_high_temp_v3_master
+        start_time_helper: input_datetime.ac_start_time_v3_master
+        end_time_helper: input_datetime.ac_end_time_v3_master
+        last_off_helper: input_datetime.ac_last_off_v3_master
+        min_off_helper: input_number.ac_min_off_v3_master
+        quick_cool_timer: timer.ac_quick_cool_v3_master
+        quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v3_master
+        quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v3_master
+
+  - alias: "ACBL-V3-Vrajraj"
+    description: "ACBL v2 automation for V3 Vrajraj"
+    use_blueprint:
+      path: AC/acbl-v2.yaml
+      input:
+        ac_switch: switch.ac_v3_vrajraj
+        power_sensor: sensor.ac_v3_vrajraj_power
+        ac_mode: input_select.ac_mode_v3_vrajraj
+        temperature_sensor: "none"
+        humidity_sensor: "none"
+        power_source_sensor: sensor.villa_1_power_source
+        grid_stable_boolean: input_boolean.grid_power_stable
+        pre_outage_state: input_boolean.ac_pre_outage_v3_vrajraj
+        target_temp_helper: input_number.ac_target_temp_v3_vrajraj
+        high_temp_helper: input_number.ac_high_temp_v3_vrajraj
+        start_time_helper: input_datetime.ac_start_time_v3_vrajraj
+        end_time_helper: input_datetime.ac_end_time_v3_vrajraj
+        last_off_helper: input_datetime.ac_last_off_v3_vrajraj
+        min_off_helper: input_number.ac_min_off_v3_vrajraj
+        quick_cool_timer: timer.ac_quick_cool_v3_vrajraj
+        quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v3_vrajraj
+        quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v3_vrajraj
+
+  - alias: "ACBL-V3-Dhaani"
+    description: "ACBL v2 automation for V3 Dhaani"
+    use_blueprint:
+      path: AC/acbl-v2.yaml
+      input:
+        ac_switch: switch.ac_v3_dhaani
+        power_sensor: sensor.ac_v3_dhaani_power
+        ac_mode: input_select.ac_mode_v3_dhaani
+        temperature_sensor: "none"
+        humidity_sensor: "none"
+        power_source_sensor: sensor.villa_1_power_source
+        grid_stable_boolean: input_boolean.grid_power_stable
+        pre_outage_state: input_boolean.ac_pre_outage_v3_dhaani
+        target_temp_helper: input_number.ac_target_temp_v3_dhaani
+        high_temp_helper: input_number.ac_high_temp_v3_dhaani
+        start_time_helper: input_datetime.ac_start_time_v3_dhaani
+        end_time_helper: input_datetime.ac_end_time_v3_dhaani
+        last_off_helper: input_datetime.ac_last_off_v3_dhaani
+        min_off_helper: input_number.ac_min_off_v3_dhaani
+        quick_cool_timer: timer.ac_quick_cool_v3_dhaani
+        quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v3_dhaani
+        quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v3_dhaani
+
+  - alias: "ACBL-V3-Office"
+    description: "ACBL v2 automation for V3 Office"
+    use_blueprint:
+      path: AC/acbl-v2.yaml
+      input:
+        ac_switch: switch.ac_v3_office
+        power_sensor: sensor.ac_v3_office_power
+        ac_mode: input_select.ac_mode_v3_office
+        temperature_sensor: "none"
+        humidity_sensor: "none"
+        power_source_sensor: sensor.villa_1_power_source
+        grid_stable_boolean: input_boolean.grid_power_stable
+        pre_outage_state: input_boolean.ac_pre_outage_v3_office
+        target_temp_helper: input_number.ac_target_temp_v3_office
+        high_temp_helper: input_number.ac_high_temp_v3_office
+        start_time_helper: input_datetime.ac_start_time_v3_office
+        end_time_helper: input_datetime.ac_end_time_v3_office
+        last_off_helper: input_datetime.ac_last_off_v3_office
+        min_off_helper: input_number.ac_min_off_v3_office
+        quick_cool_timer: timer.ac_quick_cool_v3_office
+        quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v3_office
+        quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v3_office
+
+  - alias: "ACBL-V4-Dining-1"
+    description: "ACBL v2 automation for V4 Dining 1"
+    use_blueprint:
+      path: AC/acbl-v2.yaml
+      input:
+        ac_switch: switch.ac_v4_dining_1
+        power_sensor: sensor.ac_v4_dining_1_power
+        ac_mode: input_select.ac_mode_v4_dining_1
+        temperature_sensor: "none"
+        humidity_sensor: "none"
+        power_source_sensor: sensor.villa_1_power_source
+        grid_stable_boolean: input_boolean.grid_power_stable
+        pre_outage_state: input_boolean.ac_pre_outage_v4_dining_1
+        target_temp_helper: input_number.ac_target_temp_v4_dining_1
+        high_temp_helper: input_number.ac_high_temp_v4_dining_1
+        start_time_helper: input_datetime.ac_start_time_v4_dining_1
+        end_time_helper: input_datetime.ac_end_time_v4_dining_1
+        last_off_helper: input_datetime.ac_last_off_v4_dining_1
+        min_off_helper: input_number.ac_min_off_v4_dining_1
+        quick_cool_timer: timer.ac_quick_cool_v4_dining_1
+        quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v4_dining_1
+        quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v4_dining_1
+
+  - alias: "ACBL-V4-Dining-2"
+    description: "ACBL v2 automation for V4 Dining 2"
+    use_blueprint:
+      path: AC/acbl-v2.yaml
+      input:
+        ac_switch: switch.ac_v4_dining_2
+        power_sensor: sensor.ac_v4_dining_2_power
+        ac_mode: input_select.ac_mode_v4_dining_2
+        temperature_sensor: "none"
+        humidity_sensor: "none"
+        power_source_sensor: sensor.villa_1_power_source
+        grid_stable_boolean: input_boolean.grid_power_stable
+        pre_outage_state: input_boolean.ac_pre_outage_v4_dining_2
+        target_temp_helper: input_number.ac_target_temp_v4_dining_2
+        high_temp_helper: input_number.ac_high_temp_v4_dining_2
+        start_time_helper: input_datetime.ac_start_time_v4_dining_2
+        end_time_helper: input_datetime.ac_end_time_v4_dining_2
+        last_off_helper: input_datetime.ac_last_off_v4_dining_2
+        min_off_helper: input_number.ac_min_off_v4_dining_2
+        quick_cool_timer: timer.ac_quick_cool_v4_dining_2
+        quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v4_dining_2
+        quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v4_dining_2
+
+  - alias: "ACBL-V4-Living-1"
+    description: "ACBL v2 automation for V4 Living 1"
+    use_blueprint:
+      path: AC/acbl-v2.yaml
+      input:
+        ac_switch: switch.ac_v4_living_1
+        power_sensor: sensor.ac_v4_living_1_power
+        ac_mode: input_select.ac_mode_v4_living_1
+        temperature_sensor: "none"
+        humidity_sensor: "none"
+        power_source_sensor: sensor.villa_1_power_source
+        grid_stable_boolean: input_boolean.grid_power_stable
+        pre_outage_state: input_boolean.ac_pre_outage_v4_living_1
+        target_temp_helper: input_number.ac_target_temp_v4_living_1
+        high_temp_helper: input_number.ac_high_temp_v4_living_1
+        start_time_helper: input_datetime.ac_start_time_v4_living_1
+        end_time_helper: input_datetime.ac_end_time_v4_living_1
+        last_off_helper: input_datetime.ac_last_off_v4_living_1
+        min_off_helper: input_number.ac_min_off_v4_living_1
+        quick_cool_timer: timer.ac_quick_cool_v4_living_1
+        quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v4_living_1
+        quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v4_living_1
+
+  - alias: "ACBL-V4-Living-2"
+    description: "ACBL v2 automation for V4 Living 2"
+    use_blueprint:
+      path: AC/acbl-v2.yaml
+      input:
+        ac_switch: switch.ac_v4_living_2
+        power_sensor: sensor.ac_v4_living_2_power
+        ac_mode: input_select.ac_mode_v4_living_2
+        temperature_sensor: "none"
+        humidity_sensor: "none"
+        power_source_sensor: sensor.villa_1_power_source
+        grid_stable_boolean: input_boolean.grid_power_stable
+        pre_outage_state: input_boolean.ac_pre_outage_v4_living_2
+        target_temp_helper: input_number.ac_target_temp_v4_living_2
+        high_temp_helper: input_number.ac_high_temp_v4_living_2
+        start_time_helper: input_datetime.ac_start_time_v4_living_2
+        end_time_helper: input_datetime.ac_end_time_v4_living_2
+        last_off_helper: input_datetime.ac_last_off_v4_living_2
+        min_off_helper: input_number.ac_min_off_v4_living_2
+        quick_cool_timer: timer.ac_quick_cool_v4_living_2
+        quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v4_living_2
+        quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v4_living_2
+
+  - alias: "ACBL-V4-Guest"
+    description: "ACBL v2 automation for V4 Guest"
+    use_blueprint:
+      path: AC/acbl-v2.yaml
+      input:
+        ac_switch: switch.ac_v4_guest
+        power_sensor: sensor.ac_v4_guest_power
+        ac_mode: input_select.ac_mode_v4_guest
+        temperature_sensor: "none"
+        humidity_sensor: "none"
+        power_source_sensor: sensor.villa_1_power_source
+        grid_stable_boolean: input_boolean.grid_power_stable
+        pre_outage_state: input_boolean.ac_pre_outage_v4_guest
+        target_temp_helper: input_number.ac_target_temp_v4_guest
+        high_temp_helper: input_number.ac_high_temp_v4_guest
+        start_time_helper: input_datetime.ac_start_time_v4_guest
+        end_time_helper: input_datetime.ac_end_time_v4_guest
+        last_off_helper: input_datetime.ac_last_off_v4_guest
+        min_off_helper: input_number.ac_min_off_v4_guest
+        quick_cool_timer: timer.ac_quick_cool_v4_guest
+        quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v4_guest
+        quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v4_guest
+
+  - alias: "ACBL-V5-Mandir"
+    description: "ACBL v2 automation for V5 Mandir"
+    use_blueprint:
+      path: AC/acbl-v2.yaml
+      input:
+        ac_switch: switch.ac_v5_mandir
+        power_sensor: sensor.ac_v5_mandir_power
+        ac_mode: input_select.ac_mode_v5_mandir
+        temperature_sensor: "none"
+        humidity_sensor: "none"
+        power_source_sensor: sensor.villa_1_power_source
+        grid_stable_boolean: input_boolean.grid_power_stable
+        pre_outage_state: input_boolean.ac_pre_outage_v5_mandir
+        target_temp_helper: input_number.ac_target_temp_v5_mandir
+        high_temp_helper: input_number.ac_high_temp_v5_mandir
+        start_time_helper: input_datetime.ac_start_time_v5_mandir
+        end_time_helper: input_datetime.ac_end_time_v5_mandir
+        last_off_helper: input_datetime.ac_last_off_v5_mandir
+        min_off_helper: input_number.ac_min_off_v5_mandir
+        quick_cool_timer: timer.ac_quick_cool_v5_mandir
+        quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v5_mandir
+        quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v5_mandir

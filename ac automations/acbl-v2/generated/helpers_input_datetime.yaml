@@ -1,0 +1,256 @@
+# ACBL v2 — DateTime helpers
+input_datetime:
+  ac_start_time_v1_master:
+    name: "AC Start Time — V1 Master"
+    has_time: true
+    has_date: false
+
+  ac_end_time_v1_master:
+    name: "AC End Time — V1 Master"
+    has_time: true
+    has_date: false
+
+  ac_last_off_v1_master:
+    name: "AC Last OFF — V1 Master"
+    has_time: true
+    has_date: true
+
+  ac_start_time_v1_raam:
+    name: "AC Start Time — V1 Raam"
+    has_time: true
+    has_date: false
+
+  ac_end_time_v1_raam:
+    name: "AC End Time — V1 Raam"
+    has_time: true
+    has_date: false
+
+  ac_last_off_v1_raam:
+    name: "AC Last OFF — V1 Raam"
+    has_time: true
+    has_date: true
+
+  ac_start_time_v1_radhha:
+    name: "AC Start Time — V1 Radhha"
+    has_time: true
+    has_date: false
+
+  ac_end_time_v1_radhha:
+    name: "AC End Time — V1 Radhha"
+    has_time: true
+    has_date: false
+
+  ac_last_off_v1_radhha:
+    name: "AC Last OFF — V1 Radhha"
+    has_time: true
+    has_date: true
+
+  ac_start_time_v1_yoga:
+    name: "AC Start Time — V1 Yoga"
+    has_time: true
+    has_date: false
+
+  ac_end_time_v1_yoga:
+    name: "AC End Time — V1 Yoga"
+    has_time: true
+    has_date: false
+
+  ac_last_off_v1_yoga:
+    name: "AC Last OFF — V1 Yoga"
+    has_time: true
+    has_date: true
+
+  ac_start_time_v2_study:
+    name: "AC Start Time — V2 Study"
+    has_time: true
+    has_date: false
+
+  ac_end_time_v2_study:
+    name: "AC End Time — V2 Study"
+    has_time: true
+    has_date: false
+
+  ac_last_off_v2_study:
+    name: "AC Last OFF — V2 Study"
+    has_time: true
+    has_date: true
+
+  ac_start_time_v2_sk:
+    name: "AC Start Time — V2 SK"
+    has_time: true
+    has_date: false
+
+  ac_end_time_v2_sk:
+    name: "AC End Time — V2 SK"
+    has_time: true
+    has_date: false
+
+  ac_last_off_v2_sk:
+    name: "AC Last OFF — V2 SK"
+    has_time: true
+    has_date: true
+
+  ac_start_time_v2_ck:
+    name: "AC Start Time — V2 CK"
+    has_time: true
+    has_date: false
+
+  ac_end_time_v2_ck:
+    name: "AC End Time — V2 CK"
+    has_time: true
+    has_date: false
+
+  ac_last_off_v2_ck:
+    name: "AC Last OFF — V2 CK"
+    has_time: true
+    has_date: true
+
+  ac_start_time_v3_master:
+    name: "AC Start Time — V3 Master"
+    has_time: true
+    has_date: false
+
+  ac_end_time_v3_master:
+    name: "AC End Time — V3 Master"
+    has_time: true
+    has_date: false
+
+  ac_last_off_v3_master:
+    name: "AC Last OFF — V3 Master"
+    has_time: true
+    has_date: true
+
+  ac_start_time_v3_vrajraj:
+    name: "AC Start Time — V3 Vrajraj"
+    has_time: true
+    has_date: false
+
+  ac_end_time_v3_vrajraj:
+    name: "AC End Time — V3 Vrajraj"
+    has_time: true
+    has_date: false
+
+  ac_last_off_v3_vrajraj:
+    name: "AC Last OFF — V3 Vrajraj"
+    has_time: true
+    has_date: true
+
+  ac_start_time_v3_dhaani:
+    name: "AC Start Time — V3 Dhaani"
+    has_time: true
+    has_date: false
+
+  ac_end_time_v3_dhaani:
+    name: "AC End Time — V3 Dhaani"
+    has_time: true
+    has_date: false
+
+  ac_last_off_v3_dhaani:
+    name: "AC Last OFF — V3 Dhaani"
+    has_time: true
+    has_date: true
+
+  ac_start_time_v3_office:
+    name: "AC Start Time — V3 Office"
+    has_time: true
+    has_date: false
+
+  ac_end_time_v3_office:
+    name: "AC End Time — V3 Office"
+    has_time: true
+    has_date: false
+
+  ac_last_off_v3_office:
+    name: "AC Last OFF — V3 Office"
+    has_time: true
+    has_date: true
+
+  ac_start_time_v4_dining_1:
+    name: "AC Start Time — V4 Dining 1"
+    has_time: true
+    has_date: false
+
+  ac_end_time_v4_dining_1:
+    name: "AC End Time — V4 Dining 1"
+    has_time: true
+    has_date: false
+
+  ac_last_off_v4_dining_1:
+    name: "AC Last OFF — V4 Dining 1"
+    has_time: true
+    has_date: true
+
+  ac_start_time_v4_dining_2:
+    name: "AC Start Time — V4 Dining 2"
+    has_time: true
+    has_date: false
+
+  ac_end_time_v4_dining_2:
+    name: "AC End Time — V4 Dining 2"
+    has_time: true
+    has_date: false
+
+  ac_last_off_v4_dining_2:
+    name: "AC Last OFF — V4 Dining 2"
+    has_time: true
+    has_date: true
+
+  ac_start_time_v4_living_1:
+    name: "AC Start Time — V4 Living 1"
+    has_time: true
+    has_date: false
+
+  ac_end_time_v4_living_1:
+    name: "AC End Time — V4 Living 1"
+    has_time: true
+    has_date: false
+
+  ac_last_off_v4_living_1:
+    name: "AC Last OFF — V4 Living 1"
+    has_time: true
+    has_date: true
+
+  ac_start_time_v4_living_2:
+    name: "AC Start Time — V4 Living 2"
+    has_time: true
+    has_date: false
+
+  ac_end_time_v4_living_2:
+    name: "AC End Time — V4 Living 2"
+    has_time: true
+    has_date: false
+
+  ac_last_off_v4_living_2:
+    name: "AC Last OFF — V4 Living 2"
+    has_time: true
+    has_date: true
+
+  ac_start_time_v4_guest:
+    name: "AC Start Time — V4 Guest"
+    has_time: true
+    has_date: false
+
+  ac_end_time_v4_guest:
+    name: "AC End Time — V4 Guest"
+    has_time: true
+    has_date: false
+
+  ac_last_off_v4_guest:
+    name: "AC Last OFF — V4 Guest"
+    has_time: true
+    has_date: true
+
+  ac_start_time_v5_mandir:
+    name: "AC Start Time — V5 Mandir"
+    has_time: true
+    has_date: false
+
+  ac_end_time_v5_mandir:
+    name: "AC End Time — V5 Mandir"
+    has_time: true
+    has_date: false
+
+  ac_last_off_v5_mandir:
+    name: "AC Last OFF — V5 Mandir"
+    has_time: true
+    has_date: true

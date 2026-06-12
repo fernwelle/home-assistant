@@ -1,0 +1,86 @@
+# ACBL v2 — Pre-outage state booleans
+input_boolean:
+  ac_pre_outage_v1_master:
+    name: "AC Pre-Outage State — V1 Master"
+    initial: false
+    icon: mdi:power-plug-off-outline
+
+  ac_pre_outage_v1_raam:
+    name: "AC Pre-Outage State — V1 Raam"
+    initial: false
+    icon: mdi:power-plug-off-outline
+
+  ac_pre_outage_v1_radhha:
+    name: "AC Pre-Outage State — V1 Radhha"
+    initial: false
+    icon: mdi:power-plug-off-outline
+
+  ac_pre_outage_v1_yoga:
+    name: "AC Pre-Outage State — V1 Yoga"
+    initial: false
+    icon: mdi:power-plug-off-outline
+
+  ac_pre_outage_v2_study:
+    name: "AC Pre-Outage State — V2 Study"
+    initial: false
+    icon: mdi:power-plug-off-outline
+
+  ac_pre_outage_v2_sk:
+    name: "AC Pre-Outage State — V2 SK"
+    initial: false
+    icon: mdi:power-plug-off-outline
+
+  ac_pre_outage_v2_ck:
+    name: "AC Pre-Outage State — V2 CK"
+    initial: false
+    icon: mdi:power-plug-off-outline
+
+  ac_pre_outage_v3_master:
+    name: "AC Pre-Outage State — V3 Master"
+    initial: false
+    icon: mdi:power-plug-off-outline
+
+  ac_pre_outage_v3_vrajraj:
+    name: "AC Pre-Outage State — V3 Vrajraj"
+    initial: false
+    icon: mdi:power-plug-off-outline
+
+  ac_pre_outage_v3_dhaani:
+    name: "AC Pre-Outage State — V3 Dhaani"
+    initial: false
+    icon: mdi:power-plug-off-outline
+
+  ac_pre_outage_v3_office:
+    name: "AC Pre-Outage State — V3 Office"
+    initial: false
+    icon: mdi:power-plug-off-outline
+
+  ac_pre_outage_v4_dining_1:
+    name: "AC Pre-Outage State — V4 Dining 1"
+    initial: false
+    icon: mdi:power-plug-off-outline
+
+  ac_pre_outage_v4_dining_2:
+    name: "AC Pre-Outage State — V4 Dining 2"
+    initial: false
+    icon: mdi:power-plug-off-outline
+
+  ac_pre_outage_v4_living_1:
+    name: "AC Pre-Outage State — V4 Living 1"
+    initial: false
+    icon: mdi:power-plug-off-outline
+
+  ac_pre_outage_v4_living_2:
+    name: "AC Pre-Outage State — V4 Living 2"
+    initial: false
+    icon: mdi:power-plug-off-outline
+
+  ac_pre_outage_v4_guest:
+    name: "AC Pre-Outage State — V4 Guest"
+    initial: false
+    icon: mdi:power-plug-off-outline
+
+  ac_pre_outage_v5_mandir:
+    name: "AC Pre-Outage State — V5 Mandir"
+    initial: false
+    icon: mdi:power-plug-off-outline

@@ -1,0 +1,81 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2868
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 alias: Borewell - Daily 8AM Water Usage Summary v2.0\
+description: >\
+  Every day at 8AM sends water usage report for past 24 hours and logs to Google\
+  Sheets Daily Summary tab. Notifications fire first so a Sheets failure never\
+  silences the daily report.\
+triggers:\
+  - at: "08:02:00"\
+    trigger: time\
+actions:\
+  - variables:\
+      current_level: >-\
+        \{\{ states('sensor.villas_tank_sensor_liquid_level_percent') | float(0) |\
+        round(1) \}\}\
+      level_at_8am_yesterday: "\{\{ states('input_number.tank_level_at_8am') | float(0) | round(1) \}\}"\
+      litres_remaining: "\{\{ (current_level * 50) | round(0) \}\}"\
+      litres_used: "\{\{ ((level_at_8am_yesterday - current_level) * 50) | abs | round(0) \}\}"\
+      fill_cycles: "\{\{ states('input_number.daily_fill_cycle_count') | int(0) \}\}"\
+      avg_dur: >-\
+        \{\{ states('sensor.borewell_fill_rolling_average') | float(0) | round(1)\
+        \}\}\
+      pct_used: "\{\{ (level_at_8am_yesterday - current_level) | abs | round(1) \}\}"\
+  - data:\
+      title: \uc0\u55357 \u56522  Daily Water Report - \{\{ now().strftime('%d %b %Y') \}\}\
+      message: >\
+        \uc0\u55357 \u56520  Past 24 Hours Summary: \u55357 \u56522  Used: \{\{ litres_used \}\}L (\{\{ pct_used \}\}%\
+        of tank) \uc0\u55357 \u56487  Remaining: \{\{ litres_remaining \}\}L (\{\{ current_level \}\}%) \u9881 \u65039 \
+        Borewell cycles: \{\{ fill_cycles \}\} \uc0\u9201  Avg fill time: \{\{ avg_dur \}\} mins\
+    action: notify.mobile_app_devs_nord5\
+  - data:\
+      title: \uc0\u55357 \u56522  Daily Water Report - \{\{ now().strftime('%d %b %Y') \}\}\
+      message: >\
+        \uc0\u55357 \u56520  Past 24 Hours Summary: \u55357 \u56522  Used: \{\{ litres_used \}\}L (\{\{ pct_used \}\}%\
+        of tank) \uc0\u55357 \u56487  Remaining: \{\{ litres_remaining \}\}L (\{\{ current_level \}\}%) \u9881 \u65039 \
+        Borewell cycles: \{\{ fill_cycles \}\} \uc0\u9201  Avg fill time: \{\{ avg_dur \}\} mins\
+    action: notify.mobile_app_devs_iphone\
+  - data:\
+      title: \uc0\u55357 \u56522  Daily Water Report - \{\{ now().strftime('%d %b %Y') \}\}\
+      message: >\
+        \uc0\u55357 \u56520  Past 24 Hours Summary: \u55357 \u56522  Used: \{\{ litres_used \}\}L (\{\{ pct_used \}\}%\
+        of tank) \uc0\u55357 \u56487  Remaining: \{\{ litres_remaining \}\}L (\{\{ current_level \}\}%) \u9881 \u65039 \
+        Borewell cycles: \{\{ fill_cycles \}\} \uc0\u9201  Avg fill time: \{\{ avg_dur \}\} mins\
+      notification_id: daily_water_report\
+    action: persistent_notification.create\
+  - continue_on_error: true\
+    data:\
+      date: "\{\{ now().strftime('%Y-%m-%d') \}\}"\
+      time: "08:00:00"\
+      event_type: daily snapshot\
+      tank_level_percent: "\{\{ current_level \}\}"\
+      litres_remaining: "\{\{ litres_remaining \}\}"\
+      litres_dropped: "\{\{ litres_used \}\}"\
+      borewell_state: "\{\{ states('switch.borewell') \}\}"\
+    action: rest_command.log_borewell_usage\
+  - continue_on_error: true\
+    data:\
+      date: "\{\{ now().strftime('%Y-%m-%d') \}\}"\
+      litres_used: "\{\{ litres_used \}\}"\
+      litres_remaining: "\{\{ litres_remaining \}\}"\
+      tank_level_percent: "\{\{ current_level \}\}"\
+      fill_cycles: "\{\{ fill_cycles \}\}"\
+      avg_fill_duration: "\{\{ avg_dur \}\}"\
+    action: rest_command.log_daily_summary\
+  - target:\
+      entity_id: input_number.tank_level_at_8am\
+    data:\
+      value: "\{\{ current_level \}\}"\
+    action: input_number.set_value\
+  - target:\
+      entity_id: input_number.daily_fill_cycle_count\
+    data:\
+      value: 0\
+    action: input_number.set_value\
+mode: single\
+}

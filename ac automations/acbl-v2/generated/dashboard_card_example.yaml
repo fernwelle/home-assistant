@@ -1,0 +1,388 @@
+# ════════════════════════════════════════════════════════════
+# ACBL v2 — Dashboard Card Changes
+# ════════════════════════════════════════════════════════════
+#
+# WHAT CHANGES per AC button-card:
+#
+# 1. tap_action → calls script instead of toggle
+# 2. Add ac_mode to triggers_update
+# 3. Add quick_cool status to custom_fields
+# 4. Update the runtime custom field to show QC countdown
+#
+# Everything else (styling, grid_alert, climate field) stays identical.
+#
+# Below is the V1 Raam card as a complete example.
+# For other units, just swap the entity IDs.
+# ════════════════════════════════════════════════════════════
+
+# ── BEFORE (old tap_action) ────────────────────────────────
+#   tap_action:
+#     action: toggle
+
+# ── AFTER (new tap_action) ─────────────────────────────────
+#   tap_action:
+#     action: call-service
+#     service: script.ac_dashboard_tap
+#     service_data:
+#       ac_switch: switch.ac_v1_raam
+#       ac_mode: input_select.ac_mode_v1_raam
+#       power_sensor: sensor.ac_v1_raam_power
+#       temp_sensor: sensor.temp_v1_raam_temperature
+#       humidity_sensor: sensor.temp_v1_raam_humidity
+#       start_time_helper: input_datetime.ac_start_time_v1_raam
+#       end_time_helper: input_datetime.ac_end_time_v1_raam
+#       power_source_sensor: sensor.villa_1_power_source
+#       grid_stable_boolean: input_boolean.grid_power_stable
+#       quick_cool_timer: timer.ac_quick_cool_v1_raam
+#       quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v1_raam
+#       quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v1_raam
+#       last_off_helper: input_datetime.ac_last_off_v1_raam
+#       room_name: "V1 Raam"
+
+# ── Add to triggers_update ─────────────────────────────────
+#   - input_select.ac_mode_v1_raam
+#   - timer.ac_quick_cool_v1_raam
+
+# ── New custom field: quick_cool status ────────────────────
+# Add this to custom_fields section (after runtime):
+#
+#   qc_status: |
+#     [[[
+#       const mode = states['input_select.ac_mode_v1_raam'];
+#       if (!mode || mode.state !== 'quick_cool') return '';
+#       const timer = states['timer.ac_quick_cool_v1_raam'];
+#       const baseline = states['input_number.ac_qc_baseline_temp_v1_raam'];
+#       let parts = ['❄ QUICK COOL'];
+#       if (baseline && parseFloat(baseline.state) > 0) {
+#         const target = Math.max(parseFloat(baseline.state) - 4, 23).toFixed(1);
+#         parts.push(`→ ${target}°C`);
+#       }
+#       if (timer && timer.state === 'active' && timer.attributes.remaining) {
+#         parts.push(`· ${timer.attributes.remaining}`);
+#       }
+#       return parts.join(' ');
+#     ]]]
+#
+# And add to grid-template-areas (append "qc_status qc_status" row):
+#   grid-template-areas: '"i grid_alert" "n n" "l l" "climate climate" "runtime runtime" "qc_status qc_status"'
+#   grid-template-rows: min-content min-content min-content min-content min-content min-content
+#
+# Style for qc_status custom field:
+#   qc_status:
+#     - justify-self: start
+#     - align-self: end
+#     - display: |
+#         [[[
+#           const mode = states['input_select.ac_mode_v1_raam'];
+#           return mode && mode.state === 'quick_cool' ? 'block' : 'none';
+#         ]]]
+#     - margin-top: 1px
+#     - padding: 3px 8px
+#     - border-radius: 6px
+#     - background: "rgba(56, 189, 248, 0.12)"
+#     - border: "1px solid rgba(56, 189, 248, 0.25)"
+#     - color: "#38bdf8"
+#     - font-size: 9.5px
+#     - font-weight: 600
+#     - letter-spacing: 0.3px
+
+
+# ════════════════════════════════════════════════════════════
+# COMPLETE EXAMPLE: V1 Raam card with all ACBL v2 changes
+# ════════════════════════════════════════════════════════════
+
+type: custom:button-card
+entity: switch.ac_v1_raam
+triggers_update:
+  - input_boolean.grid_power_stable
+  - sensor.esp8266_mains_vs_grid_voltage_state
+  - sensor.ac_v1_raam_on_time_today
+  - sensor.ac_v1_raam_cooling_time_today
+  - sensor.temp_v1_raam_temperature
+  - sensor.temp_v1_raam_humidity
+  - input_select.ac_mode_v1_raam
+  - timer.ac_quick_cool_v1_raam
+variables:
+  temp_sensor: sensor.temp_v1_raam_temperature
+  humidity_sensor: sensor.temp_v1_raam_humidity
+name: Raam
+label: 1.5T GTKC50
+show_state: false
+show_label: true
+show_icon: true
+icon: mdi:snowflake
+tap_action:
+  action: call-service
+  service: script.ac_dashboard_tap
+  service_data:
+    ac_switch: switch.ac_v1_raam
+    ac_mode: input_select.ac_mode_v1_raam
+    power_sensor: sensor.ac_v1_raam_power
+    temp_sensor: sensor.temp_v1_raam_temperature
+    humidity_sensor: sensor.temp_v1_raam_humidity
+    start_time_helper: input_datetime.ac_start_time_v1_raam
+    end_time_helper: input_datetime.ac_end_time_v1_raam
+    power_source_sensor: sensor.villa_1_power_source
+    grid_stable_boolean: input_boolean.grid_power_stable
+    quick_cool_timer: timer.ac_quick_cool_v1_raam
+    quick_cool_baseline_temp: input_number.ac_qc_baseline_temp_v1_raam
+    quick_cool_baseline_humidity: input_number.ac_qc_baseline_humidity_v1_raam
+    last_off_helper: input_datetime.ac_last_off_v1_raam
+    room_name: "V1 Raam"
+hold_action:
+  action: more-info
+custom_fields:
+  grid_alert: |
+    [[[
+      const gridSensor = states['sensor.esp8266_mains_vs_grid_voltage_state'];
+      const gridOn = gridSensor && gridSensor.state.toLowerCase() === 'on';
+      const stable = states['input_boolean.grid_power_stable'] && states['input_boolean.grid_power_stable'].state === 'on';
+      if (stable) return '';
+      if (gridOn && !stable) return 'STABILIZING';
+      return 'GRID OFF';
+    ]]]
+  climate: |
+    [[[
+      const tempId = variables && variables.temp_sensor ? variables.temp_sensor : '';
+      const humidityId = variables && variables.humidity_sensor ? variables.humidity_sensor : '';
+      const tempRaw = tempId && states[tempId] ? states[tempId].state : '';
+      const humidityRaw = humidityId && states[humidityId] ? states[humidityId].state : '';
+      const tempOk = tempRaw && !['unknown', 'unavailable', 'none'].includes(String(tempRaw).toLowerCase());
+      const humidityOk = humidityRaw && !['unknown', 'unavailable', 'none'].includes(String(humidityRaw).toLowerCase());
+      const temp = tempOk ? parseFloat(tempRaw).toFixed(1) : '';
+      const humidity = humidityOk ? parseFloat(humidityRaw).toFixed(0) : '';
+      if (tempOk && humidityOk) return `🌡 ${temp}°C • ${humidity}%`;
+      if (tempOk) return `🌡 ${temp}°C`;
+      if (humidityOk) return `💧 ${humidity}%`;
+      return '';
+    ]]]
+  runtime: |
+    [[[
+      const onTimeEntity = states['sensor.ac_v1_raam_on_time_today'];
+      const coolTimeEntity = states['sensor.ac_v1_raam_cooling_time_today'];
+      const onRaw = onTimeEntity ? parseFloat(onTimeEntity.state) : 0;
+      const coolRaw = coolTimeEntity ? parseFloat(coolTimeEntity.state) : 0;
+      const onValid = onTimeEntity && !['unknown', 'unavailable'].includes(onTimeEntity.state);
+      const coolValid = coolTimeEntity && !['unknown', 'unavailable'].includes(coolTimeEntity.state);
+      if (!onValid && !coolValid) return '';
+      const fmt = (h) => {
+        const hrs = Math.floor(h);
+        const mins = Math.round((h - hrs) * 60);
+        if (hrs > 0 && mins > 0) return `${hrs}h ${mins}m`;
+        if (hrs > 0) return `${hrs}h`;
+        return `${mins}m`;
+      };
+      const parts = [];
+      if (onValid && onRaw > 0.01) parts.push(`⏱ ${fmt(onRaw)}`);
+      if (coolValid && coolRaw > 0.01) parts.push(`❄ ${fmt(coolRaw)}`);
+      return parts.join(' · ');
+    ]]]
+  qc_status: |
+    [[[
+      const mode = states['input_select.ac_mode_v1_raam'];
+      if (!mode || mode.state !== 'quick_cool') return '';
+      const timer = states['timer.ac_quick_cool_v1_raam'];
+      const baseline = states['input_number.ac_qc_baseline_temp_v1_raam'];
+      let parts = ['❄ QUICK COOL'];
+      if (baseline && parseFloat(baseline.state) > 0) {
+        const target = Math.max(parseFloat(baseline.state) - 4, 23).toFixed(1);
+        parts.push(`→ ${target}°C`);
+      }
+      if (timer && timer.state === 'active' && timer.attributes.remaining) {
+        parts.push(`· ${timer.attributes.remaining}`);
+      }
+      return parts.join(' ');
+    ]]]
+styles:
+  card:
+    - position: relative
+    - border-radius: 10px
+    - padding: 14px 16px
+    - height: 140px
+    - background: |
+        [[[
+          const gridSensor = states['sensor.esp8266_mains_vs_grid_voltage_state'];
+          const gridOn = gridSensor && gridSensor.state.toLowerCase() === 'on';
+          const stable = states['input_boolean.grid_power_stable'] && states['input_boolean.grid_power_stable'].state === 'on';
+          const acOn = entity && entity.state === 'on';
+          const qcMode = states['input_select.ac_mode_v1_raam'];
+          const inQC = qcMode && qcMode.state === 'quick_cool';
+          if (!gridOn) return '#24181d';
+          if (gridOn && !stable) return '#231f18';
+          if (inQC && acOn) return '#161e24';
+          if (acOn) return '#162019';
+          return '#181a22';
+        ]]]
+    - border: |
+        [[[
+          const gridSensor = states['sensor.esp8266_mains_vs_grid_voltage_state'];
+          const gridOn = gridSensor && gridSensor.state.toLowerCase() === 'on';
+          const stable = states['input_boolean.grid_power_stable'] && states['input_boolean.grid_power_stable'].state === 'on';
+          const acOn = entity && entity.state === 'on';
+          const qcMode = states['input_select.ac_mode_v1_raam'];
+          const inQC = qcMode && qcMode.state === 'quick_cool';
+          if (!gridOn) return '2px solid #f87171';
+          if (gridOn && !stable) return '2px solid #fbbf24';
+          if (inQC && acOn) return '1px solid rgba(56,189,248,0.34)';
+          if (acOn) return '1px solid rgba(74,222,128,0.34)';
+          return '1px solid rgba(255,255,255,0.06)';
+        ]]]
+    - box-shadow: |
+        [[[
+          const gridSensor = states['sensor.esp8266_mains_vs_grid_voltage_state'];
+          const gridOn = gridSensor && gridSensor.state.toLowerCase() === 'on';
+          const stable = states['input_boolean.grid_power_stable'] && states['input_boolean.grid_power_stable'].state === 'on';
+          if (!gridOn) return '0 0 0 1px rgba(248,113,113,0.10)';
+          if (gridOn && !stable) return '0 0 0 1px rgba(251,191,36,0.10)';
+          return 'none';
+        ]]]
+    - transition: all 0.2s ease
+  grid:
+    - grid-template-areas: '"i grid_alert" "n n" "l l" "climate climate" "runtime runtime" "qc_status qc_status"'
+    - grid-template-columns: 1fr min-content
+    - grid-template-rows: min-content min-content min-content min-content min-content min-content
+    - row-gap: 3px
+  img_cell:
+    - justify-content: start
+    - align-items: start
+    - width: 28px
+    - height: 28px
+  icon:
+    - width: 22px
+    - justify-self: start
+    - color: |
+        [[[
+          const gridSensor = states['sensor.esp8266_mains_vs_grid_voltage_state'];
+          const gridOn = gridSensor && gridSensor.state.toLowerCase() === 'on';
+          const stable = states['input_boolean.grid_power_stable'] && states['input_boolean.grid_power_stable'].state === 'on';
+          const acOn = entity && entity.state === 'on';
+          const qcMode = states['input_select.ac_mode_v1_raam'];
+          const inQC = qcMode && qcMode.state === 'quick_cool';
+          if (!gridOn) return '#f87171';
+          if (gridOn && !stable) return '#fbbf24';
+          if (inQC && acOn) return '#38bdf8';
+          if (acOn) return '#4ade80';
+          return '#6b6e7d';
+        ]]]
+    - opacity: |
+        [[[
+          const acOn = entity && entity.state === 'on';
+          return acOn ? '1' : '0.75';
+        ]]]
+  name:
+    - justify-self: start
+    - font-size: 13px
+    - font-weight: 600
+    - color: |
+        [[[
+          const acOn = entity && entity.state === 'on';
+          return acOn ? '#f0f0f3' : '#a0a3b1';
+        ]]]
+  label:
+    - justify-self: start
+    - font-size: 10px
+    - color: |
+        [[[
+          const acOn = entity && entity.state === 'on';
+          const qcMode = states['input_select.ac_mode_v1_raam'];
+          const inQC = qcMode && qcMode.state === 'quick_cool';
+          if (inQC && acOn) return '#38bdf8';
+          return acOn ? '#4ade80' : '#6b6e7d';
+        ]]]
+  custom_fields:
+    grid_alert:
+      - justify-self: end
+      - align-self: start
+      - display: |
+          [[[
+            const gridSensor = states['sensor.esp8266_mains_vs_grid_voltage_state'];
+            const gridOn = gridSensor && gridSensor.state.toLowerCase() === 'on';
+            const stable = states['input_boolean.grid_power_stable'] && states['input_boolean.grid_power_stable'].state === 'on';
+            return stable ? 'none' : 'block';
+          ]]]
+      - padding: 2px 7px
+      - border-radius: 20px
+      - background: |
+          [[[
+            const gridSensor = states['sensor.esp8266_mains_vs_grid_voltage_state'];
+            const gridOn = gridSensor && gridSensor.state.toLowerCase() === 'on';
+            if (!gridOn) return 'rgba(248,113,113,0.14)';
+            return 'rgba(251,191,36,0.14)';
+          ]]]
+      - border: |
+          [[[
+            const gridSensor = states['sensor.esp8266_mains_vs_grid_voltage_state'];
+            const gridOn = gridSensor && gridSensor.state.toLowerCase() === 'on';
+            if (!gridOn) return '1px solid rgba(248,113,113,0.45)';
+            return '1px solid rgba(251,191,36,0.45)';
+          ]]]
+      - color: |
+          [[[
+            const gridSensor = states['sensor.esp8266_mains_vs_grid_voltage_state'];
+            const gridOn = gridSensor && gridSensor.state.toLowerCase() === 'on';
+            if (!gridOn) return '#f87171';
+            return '#fbbf24';
+          ]]]
+      - font-size: 9px
+      - font-weight: 700
+      - letter-spacing: 0.5px
+      - white-space: nowrap
+    climate:
+      - justify-self: start
+      - align-self: end
+      - display: |
+          [[[
+            const tempId = variables && variables.temp_sensor ? variables.temp_sensor : '';
+            const humidityId = variables && variables.humidity_sensor ? variables.humidity_sensor : '';
+            const tempRaw = tempId && states[tempId] ? states[tempId].state : '';
+            const humidityRaw = humidityId && states[humidityId] ? states[humidityId].state : '';
+            const tempOk = tempRaw && !['unknown', 'unavailable', 'none'].includes(String(tempRaw).toLowerCase());
+            const humidityOk = humidityRaw && !['unknown', 'unavailable', 'none'].includes(String(humidityRaw).toLowerCase());
+            return tempOk || humidityOk ? 'block' : 'none';
+          ]]]
+      - margin-top: 2px
+      - padding: 3px 8px
+      - border-radius: 6px
+      - background: "#1e2029"
+      - border: 1px solid rgba(255,255,255,0.06)
+      - color: "#a0a3b1"
+      - font-size: 10px
+      - font-weight: 500
+    runtime:
+      - justify-self: start
+      - align-self: end
+      - display: |
+          [[[
+            const onTimeEntity = states['sensor.ac_v1_raam_on_time_today'];
+            const coolTimeEntity = states['sensor.ac_v1_raam_cooling_time_today'];
+            const onRaw = onTimeEntity ? parseFloat(onTimeEntity.state) : 0;
+            const coolRaw = coolTimeEntity ? parseFloat(coolTimeEntity.state) : 0;
+            const onValid = onTimeEntity && !['unknown', 'unavailable'].includes(onTimeEntity.state);
+            const coolValid = coolTimeEntity && !['unknown', 'unavailable'].includes(coolTimeEntity.state);
+            return (onValid && onRaw > 0.01) || (coolValid && coolRaw > 0.01) ? 'block' : 'none';
+          ]]]
+      - margin-top: 1px
+      - padding: 3px 8px
+      - border-radius: 6px
+      - background: "#1a1c25"
+      - border: 1px solid rgba(255,255,255,0.04)
+      - color: "#7c7f8e"
+      - font-size: 9.5px
+      - font-weight: 500
+    qc_status:
+      - justify-self: start
+      - align-self: end
+      - display: |
+          [[[
+            const mode = states['input_select.ac_mode_v1_raam'];
+            return mode && mode.state === 'quick_cool' ? 'block' : 'none';
+          ]]]
+      - margin-top: 1px
+      - padding: 3px 8px
+      - border-radius: 6px
+      - background: "rgba(56, 189, 248, 0.12)"
+      - border: "1px solid rgba(56, 189, 248, 0.25)"
+      - color: "#38bdf8"
+      - font-size: 9.5px
+      - font-weight: 600
+      - letter-spacing: 0.3px

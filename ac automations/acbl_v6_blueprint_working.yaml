@@ -1,0 +1,907 @@
+blueprint:
+  name: "ACBL v6 — Smart AC Controller (dashboard duration)"
+  description: >
+    Unified AC automation with three operating modes:
+      AUTO   — time-window scheduling + temperature hysteresis + compressor protection.
+               Thermostat cycling only runs within an active session (human intent
+               confirmed by a manual tap or QC expiry inside the window). Auto mode
+               never self-starts the AC — a human tap is always required to begin
+               a session. Session persists across power cuts (restore: true).
+      QUICK COOL — manual override with auto-expiry (timer / temp drop / humidity / floor).
+               If QC expires while inside the window, session is auto-activated so
+               thermostat cycling continues without requiring a second tap.
+      OFF    — full manual control, only genset protection active.
+               AC can be operated via remote; HA only intervenes on genset.
+      MANUAL — timer-based mode for sensorless rooms. Window ignored.
+               Tap starts QC timer; timer expiry turns AC off. Mode stays
+               manual. Genset protection and restore active.
+      BYPASS — completely hands-off emergency mode. No automation, no
+               genset protection, no restore. HA never touches the switch.
+
+    v6 changes vs v5:
+      - NEW: manual mode — sensorless room timer mode, window ignored,
+        timer-only exit, genset protection + restore active.
+      - NEW: bypass mode — fully hands-off, no genset protection, no restore.
+        Emergency mode for operating AC on genset via remote only.
+      - input_select now has 5 options: auto, quick_cool, manual, off, bypass.
+      - NEW: Session-gated auto mode. Auto thermostat never self-starts; requires
+        a manual tap (inside window) or QC→auto transition inside window to activate
+        the session. Manual tap-off inside window clears the session immediately.
+      - Window close always clears the session.
+      - All QC logic and genset protection unchanged.
+
+  domain: automation
+
+  input:
+    # ── Core entities ──────────────────────────────────────
+    ac_switch:
+      name: AC Switch (Tapo Plug)
+      description: "Search: switch.ac_{villa}_{room} — e.g. switch.ac_v1_raam"
+      selector:
+        entity:
+          domain: switch
+
+    power_sensor:
+      name: Power Sensor (P110 wattage)
+      description: "Search: sensor.ac_{villa}_{room}_power — e.g. sensor.ac_v1_raam_power"
+      selector:
+        entity:
+          domain: sensor
+
+    # ── Mode control ───────────────────────────────────────
+    ac_mode:
+      name: "AC Mode (auto / quick_cool / off)"
+      description: "Search: input_select.ac_mode_{villa}_{room} — e.g. input_select.ac_mode_v1_raam. Options: auto / quick_cool / manual / off / bypass"
+      selector:
+        entity:
+          domain: input_select
+
+    # ── Optional sensors ───────────────────────────────────
+    temperature_sensor:
+      name: Temperature Sensor (optional)
+      description: "Search: sensor.temp_{villa}_{room}_zb_temperature — Leave as 'none' if no sensor for this room"
+      default: "none"
+      selector:
+        entity:
+          domain: sensor
+
+    humidity_sensor:
+      name: Humidity Sensor (optional)
+      description: "Search: sensor.temp_{villa}_{room}_zb_humidity — Leave as 'none' if no sensor for this room"
+      default: "none"
+      selector:
+        entity:
+          domain: sensor
+
+    # ── Grid / genset protection ───────────────────────────
+    power_source_sensor:
+      name: Power Source Sensor
+      description: "SAME FOR ALL UNITS → sensor.villa_1_power_source"
+      selector:
+        entity:
+          domain: sensor
+
+    grid_stable_boolean:
+      name: Grid Power Stable Boolean
+      description: "SAME FOR ALL UNITS → input_boolean.grid_power_stable"
+      selector:
+        entity:
+          domain: input_boolean
+
+    pre_outage_state:
+      name: Pre-Outage AC State
+      description: "Search: input_boolean.ac_pre_outage_{villa}_{room} — e.g. input_boolean.ac_pre_outage_v1_raam (automation-managed, do not touch manually)"
+      selector:
+        entity:
+          domain: input_boolean
+
+    manual_intent_flag:
+      name: Manual Intent Flag
+      description: "Search: input_boolean.ac_manual_intent_{villa}_{room} — set by the tap script just before turning the AC on, cleared by this automation. Do not touch manually."
+      selector:
+        entity:
+          domain: input_boolean
+
+    session_active_flag:
+      name: Session Active Flag
+      description: "Search: input_boolean.ac_session_active_{villa}_{room} — e.g. input_boolean.ac_session_active_v1_raam. Tracks human intent to cool within the current window. Set by manual tap inside window or QC expiry inside window. Cleared by window close or manual tap-off. Do not touch manually."
+      selector:
+        entity:
+          domain: input_boolean
+
+    # ── Auto mode helpers ──────────────────────────────────
+    target_temp_helper:
+      name: Target Temperature Helper (turn OFF below)
+      description: "Search: input_number.ac_target_temp_{villa}_{room} — e.g. input_number.ac_target_temp_v1_raam"
+      selector:
+        entity:
+          domain: input_number
+
+    high_temp_helper:
+      name: Turn ON Above Helper
+      description: "Search: input_number.ac_high_temp_{villa}_{room} — e.g. input_number.ac_high_temp_v1_raam"
+      selector:
+        entity:
+          domain: input_number
+
+    start_time_helper:
+      name: Schedule Start Time
+      description: "Search: input_datetime.ac_start_time_{villa}_{room} — e.g. input_datetime.ac_start_time_v1_raam"
+      selector:
+        entity:
+          domain: input_datetime
+
+    end_time_helper:
+      name: Schedule End Time
+      description: "Search: input_datetime.ac_end_time_{villa}_{room} — e.g. input_datetime.ac_end_time_v1_raam"
+      selector:
+        entity:
+          domain: input_datetime
+
+    last_off_helper:
+      name: Last OFF Timestamp
+      description: "Search: input_datetime.ac_last_off_{villa}_{room} — e.g. input_datetime.ac_last_off_v1_raam"
+      selector:
+        entity:
+          domain: input_datetime
+
+    min_off_helper:
+      name: Minimum OFF Minutes Helper
+      description: "Search: input_number.ac_min_off_{villa}_{room} — e.g. input_number.ac_min_off_v1_raam (3 min inverter, 5 min non-inverter)"
+      selector:
+        entity:
+          domain: input_number
+
+    power_threshold:
+      name: Power Threshold (AC actively cooling)
+      description: "Default 100W — compressor draws >100W when cooling"
+      default: 100
+      selector:
+        number:
+          min: 50
+          max: 2000
+
+    power_on_threshold:
+      name: Power ON Threshold (AC is on at all)
+      description: "Default 2W — anything above means plug/AC is drawing power"
+      default: 2
+      selector:
+        number:
+          min: 1
+          max: 50
+
+    # ── Quick cool helpers ─────────────────────────────────
+    quick_cool_timer:
+      name: Quick Cool Timer Entity
+      description: "Search: timer.ac_quick_cool_{villa}_{room} — e.g. timer.ac_quick_cool_v1_raam"
+      selector:
+        entity:
+          domain: timer
+
+    quick_cool_baseline_temp:
+      name: Quick Cool Baseline Temp Snapshot
+      description: "Search: input_number.ac_qc_baseline_temp_{villa}_{room} — e.g. input_number.ac_qc_baseline_temp_v1_raam (automation-managed, do not touch)"
+      selector:
+        entity:
+          domain: input_number
+
+    quick_cool_baseline_humidity:
+      name: Quick Cool Baseline Humidity Snapshot
+      description: "Search: input_number.ac_qc_baseline_humidity_{villa}_{room} — e.g. input_number.ac_qc_baseline_humidity_v1_raam (automation-managed, do not touch)"
+      selector:
+        entity:
+          domain: input_number
+
+    quick_cool_temp_drop:
+      name: Quick Cool Temperature Drop Target
+      description: "Default 4°C — AC stops when room drops this many degrees from baseline"
+      default: 4
+      selector:
+        number:
+          min: 1
+          max: 10
+          step: 0.5
+
+    quick_cool_temp_floor:
+      name: Quick Cool Temperature Floor
+      description: "Default 25°C — AC never cools below this, even if 4°C drop not reached"
+      default: 25
+      selector:
+        number:
+          min: 18
+          max: 28
+          step: 0.5
+
+    quick_cool_humidity_target:
+      name: Quick Cool Humidity Target
+      description: "Default 30% — AC stops if humidity drops to or below this"
+      default: 30
+      selector:
+        number:
+          min: 20
+          max: 60
+
+    quick_cool_duration_helper:
+      name: Quick Cool Duration Helper
+      description: "Search: input_number.ac_qc_duration_{villa}_{room} — e.g. input_number.ac_qc_duration_v1_raam. Create as Number helper: min 15, max 180, step 15, unit min. Adjust from dashboard without editing the automation."
+      selector:
+        entity:
+          domain: input_number
+
+mode: restart
+
+trigger:
+  - platform: time_pattern
+    minutes: "/2"
+    id: poll
+
+  - platform: time
+    at: !input start_time_helper
+    id: window_open
+
+  - platform: time
+    at: !input end_time_helper
+    id: window_close
+
+  - platform: state
+    entity_id: !input ac_switch
+    from: "off"
+    to: "on"
+    id: switch_on
+
+  - platform: state
+    entity_id: !input ac_switch
+    from: "on"
+    to: "off"
+    id: switch_off
+
+  - platform: state
+    entity_id: !input grid_stable_boolean
+    id: grid_change
+
+  - platform: state
+    entity_id: !input ac_mode
+    id: mode_change
+
+  - platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: !input quick_cool_timer
+    id: quick_cool_timer_done
+
+  - platform: homeassistant
+    event: start
+    id: ha_start
+
+variables:
+  # ── Input mappings ───────────────────────────────────────
+  temp_sensor_id: !input temperature_sensor
+  humidity_sensor_id: !input humidity_sensor
+  ac_switch_entity: !input ac_switch
+  power_sensor_entity: !input power_sensor
+  power_source_entity: !input power_source_sensor
+  grid_stable_entity: !input grid_stable_boolean
+  pre_outage_entity: !input pre_outage_state
+  mode_entity: !input ac_mode
+  target_entity: !input target_temp_helper
+  high_entity: !input high_temp_helper
+  min_off_entity: !input min_off_helper
+  start_time_entity: !input start_time_helper
+  end_time_entity: !input end_time_helper
+  last_off_entity: !input last_off_helper
+  qc_timer_entity: !input quick_cool_timer
+  qc_baseline_temp_entity: !input quick_cool_baseline_temp
+  qc_baseline_humidity_entity: !input quick_cool_baseline_humidity
+
+  power_limit: !input power_threshold
+  power_on_limit: !input power_on_threshold
+  qc_temp_drop: !input quick_cool_temp_drop
+  qc_temp_floor: !input quick_cool_temp_floor
+  qc_humidity_target: !input quick_cool_humidity_target
+  qc_duration_entity: !input quick_cool_duration_helper
+  qc_duration: "{{ states(qc_duration_entity) | int(90) }}"
+
+  # ── Runtime state ────────────────────────────────────────
+  mode: "{{ states(mode_entity) | trim }}"
+
+  power: "{{ states(power_sensor_entity) | float(0) }}"
+  ac_consuming: "{{ power > power_on_limit }}"
+  ac_cooling: "{{ power > power_limit }}"
+
+  power_source: "{{ states(power_source_entity) | trim }}"
+  on_grid: "{{ power_source == 'grid' }}"
+  grid_stable: "{{ states(grid_stable_entity) == 'on' }}"
+  on_genset: "{{ power_source in ['genset', 'panel_fault', 'no_power'] }}"
+
+  was_running: "{{ states(pre_outage_entity) == 'on' }}"
+
+  temp_available: >
+    {{ temp_sensor_id not in ['none', '', 'None', 'unknown', 'unavailable']
+       and states(temp_sensor_id) not in ['unknown', 'unavailable', 'None', '']
+       and states(temp_sensor_id) | float(-999) > -900 }}
+  temp: "{{ states(temp_sensor_id) | float(0) if temp_available else 0 }}"
+
+  humidity_available: >
+    {{ humidity_sensor_id not in ['none', '', 'None', 'unknown', 'unavailable']
+       and states(humidity_sensor_id) not in ['unknown', 'unavailable', 'None', '']
+       and states(humidity_sensor_id) | float(-999) > -900 }}
+  humidity: "{{ states(humidity_sensor_id) | float(0) if humidity_available else 0 }}"
+
+  target: "{{ states(target_entity) | float(24) }}"
+  high: "{{ states(high_entity) | float(26) }}"
+  min_off: "{{ states(min_off_entity) | float(3) }}"
+
+  start_time_raw: "{{ states(start_time_entity) }}"
+  end_time_raw: "{{ states(end_time_entity) }}"
+  in_time_window: >
+    {% set now_t = now().time() %}
+    {% set s = strptime(start_time_raw, '%H:%M:%S').time() if ':' in start_time_raw else now_t %}
+    {% set e = strptime(end_time_raw, '%H:%M:%S').time() if ':' in end_time_raw else now_t %}
+    {{ (s < e and s <= now_t <= e) or (s > e and (now_t >= s or now_t <= e)) }}
+
+  now_ts: "{{ now().timestamp() }}"
+  last_off_ts: >
+    {% set t = states(last_off_entity) %}
+    {% if t not in ['unknown', 'unavailable', ''] %}
+      {{ as_timestamp(t, 0) }}
+    {% else %}
+      0
+    {% endif %}
+  off_elapsed: "{{ (now_ts - last_off_ts) / 60 }}"
+
+  # ── Manual-on detection ──────────────────────────────────
+  manual_intent_entity: !input manual_intent_flag
+  manual_switch_on: >
+    {{ trigger.id == 'switch_on'
+       and is_state(manual_intent_entity, 'on') }}
+
+  # ── Session active ───────────────────────────────────────
+  # True when a human has expressed intent to cool within this window.
+  # Persists across power cuts via restore: true on the helper.
+  session_entity: !input session_active_flag
+  session_active: "{{ is_state(session_entity, 'on') }}"
+
+  # Quick cool computed targets
+  qc_baseline_temp: "{{ states(qc_baseline_temp_entity) | float(0) }}"
+  qc_baseline_humidity: "{{ states(qc_baseline_humidity_entity) | float(0) }}"
+  qc_target_temp: "{{ [qc_baseline_temp - qc_temp_drop, qc_temp_floor] | max }}"
+
+  qc_temp_reached: "{{ temp_available and temp <= qc_target_temp }}"
+  qc_humidity_reached: "{{ humidity_available and humidity <= qc_humidity_target }}"
+  qc_temp_floor_hit: "{{ temp_available and temp <= qc_temp_floor }}"
+  qc_sensors_dead: "{{ not temp_available and not humidity_available }}"
+
+action:
+  - choose:
+
+      # ═══════════════════════════════════════════════════════
+      # PRIORITY 0: Manual switch-ON in AUTO mode, OUTSIDE window
+      #             → convert to QUICK COOL.
+      # Unchanged from v4.
+      # ═══════════════════════════════════════════════════════
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ manual_switch_on and mode == 'auto'
+                 and not in_time_window and grid_stable and on_grid }}
+        sequence:
+          - service: input_boolean.turn_off
+            target:
+              entity_id: !input manual_intent_flag
+          - service: input_number.set_value
+            target:
+              entity_id: !input quick_cool_baseline_temp
+            data:
+              value: "{{ temp if temp_available else 0 }}"
+          - service: input_number.set_value
+            target:
+              entity_id: !input quick_cool_baseline_humidity
+            data:
+              value: "{{ humidity if humidity_available else 0 }}"
+          - service: timer.start
+            target:
+              entity_id: !input quick_cool_timer
+            data:
+              duration: "{{ '%02d:%02d:00' | format((qc_duration | int) // 60, (qc_duration | int) % 60) }}"
+          - service: input_select.select_option
+            target:
+              entity_id: !input ac_mode
+            data:
+              option: "quick_cool"
+
+      # ═══════════════════════════════════════════════════════
+      # PRIORITY 0b: Manual switch-ON in AUTO mode, INSIDE window
+      #              → activate session so thermostat cycling begins.
+      # NEW in v5. Clears the intent flag and sets session_active.
+      # ═══════════════════════════════════════════════════════
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ manual_switch_on and mode == 'auto'
+                 and in_time_window and grid_stable and on_grid }}
+        sequence:
+          - service: input_boolean.turn_off
+            target:
+              entity_id: !input manual_intent_flag
+          - service: input_boolean.turn_on
+            target:
+              entity_id: !input session_active_flag
+
+      # ═══════════════════════════════════════════════════════
+      # PRIORITY 0c: Manual mode change → quick_cool
+      #   Fires when the user manually sets input_select to
+      #   quick_cool via the backend card or dashboard.
+      #   Snapshots baseline, starts timer, turns AC on.
+      #   This is the sensorless room's primary QC entry path
+      #   inside the window (tap outside window uses P0 instead).
+      # ═══════════════════════════════════════════════════════
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ trigger.id == 'mode_change'
+                 and mode in ['quick_cool', 'manual']
+                 and grid_stable and on_grid }}
+        sequence:
+          - service: input_number.set_value
+            target:
+              entity_id: !input quick_cool_baseline_temp
+            data:
+              value: "{{ temp if temp_available else 0 }}"
+          - service: input_number.set_value
+            target:
+              entity_id: !input quick_cool_baseline_humidity
+            data:
+              value: "{{ humidity if humidity_available else 0 }}"
+          - service: timer.start
+            target:
+              entity_id: !input quick_cool_timer
+            data:
+              duration: "{{ '%02d:%02d:00' | format((qc_duration | int) // 60, (qc_duration | int) % 60) }}"
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ not ac_consuming and off_elapsed >= min_off }}"
+                sequence:
+                  - service: switch.turn_on
+                    target:
+                      entity_id: !input ac_switch
+
+      # ═══════════════════════════════════════════════════════
+      # PRIORITY 0d: Manual switch-ON in MANUAL mode
+      #   Window ignored. Snapshots baseline, starts QC timer,
+      #   AC on. Mode stays 'manual' throughout — never reverts
+      #   to auto. Timer is the only exit (plus genset/tap-off).
+      # ═══════════════════════════════════════════════════════
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ manual_switch_on and mode == 'manual'
+                 and grid_stable and on_grid }}
+        sequence:
+          - service: input_boolean.turn_off
+            target:
+              entity_id: !input manual_intent_flag
+          - service: input_number.set_value
+            target:
+              entity_id: !input quick_cool_baseline_temp
+            data:
+              value: "{{ temp if temp_available else 0 }}"
+          - service: input_number.set_value
+            target:
+              entity_id: !input quick_cool_baseline_humidity
+            data:
+              value: "{{ humidity if humidity_available else 0 }}"
+          - service: timer.start
+            target:
+              entity_id: !input quick_cool_timer
+            data:
+              duration: "{{ '%02d:%02d:00' | format((qc_duration | int) // 60, (qc_duration | int) % 60) }}"
+          - service: switch.turn_on
+            target:
+              entity_id: !input ac_switch
+
+      # ═══════════════════════════════════════════════════════
+      # PRIORITY 1: Mode = OFF → only genset protection
+      # ═══════════════════════════════════════════════════════
+      - conditions:
+          - condition: template
+            value_template: "{{ mode == 'off' }}"
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ on_genset and ac_consuming }}"
+                sequence:
+                  - service: switch.turn_off
+                    target:
+                      entity_id: !input ac_switch
+                  - service: input_datetime.set_datetime
+                    target:
+                      entity_id: !input last_off_helper
+                    data:
+                      datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+
+      # ═══════════════════════════════════════════════════════
+      # PRIORITY 2: Genset / unstable grid → force OFF + remember
+      # ═══════════════════════════════════════════════════════
+      - conditions:
+          - condition: template
+            value_template: "{{ (on_genset or not grid_stable) and mode != 'bypass' }}"
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ ac_consuming }}"
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ not was_running }}"
+                        sequence:
+                          - service: input_boolean.turn_on
+                            target:
+                              entity_id: !input pre_outage_state
+                  - service: switch.turn_off
+                    target:
+                      entity_id: !input ac_switch
+                  - service: input_datetime.set_datetime
+                    target:
+                      entity_id: !input last_off_helper
+                    data:
+                      datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ mode == 'quick_cool' }}"
+                        sequence:
+                          - service: timer.pause
+                            target:
+                              entity_id: !input quick_cool_timer
+
+      # ═══════════════════════════════════════════════════════
+      # PRIORITY 3: Grid just stabilized → restore if was running
+      # ═══════════════════════════════════════════════════════
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ grid_stable and on_grid and was_running
+                 and not ac_consuming and off_elapsed >= min_off
+                 and mode != 'bypass' }}
+        sequence:
+          - service: switch.turn_on
+            target:
+              entity_id: !input ac_switch
+          - service: input_boolean.turn_off
+            target:
+              entity_id: !input pre_outage_state
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ mode == 'quick_cool' }}"
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: state
+                            entity_id: !input quick_cool_timer
+                            state: "paused"
+                        sequence:
+                          - service: timer.start
+                            target:
+                              entity_id: !input quick_cool_timer
+                    default:
+                      - service: input_select.select_option
+                        target:
+                          entity_id: !input ac_mode
+                        data:
+                          option: "auto"
+
+      # ═══════════════════════════════════════════════════════
+      # PRIORITY 4: Quick Cool mode
+      # Unchanged from v4 except QC→auto expiry now sets
+      # session_active if inside the window (handled in the
+      # timer-done block below).
+      # ═══════════════════════════════════════════════════════
+      - conditions:
+          - condition: template
+            value_template: "{{ mode == 'quick_cool' and grid_stable }}"
+        sequence:
+          - choose:
+
+              - conditions:
+                  - condition: template
+                    value_template: "{{ qc_temp_reached and ac_consuming }}"
+                sequence:
+                  - service: switch.turn_off
+                    target:
+                      entity_id: !input ac_switch
+                  - service: input_datetime.set_datetime
+                    target:
+                      entity_id: !input last_off_helper
+                    data:
+                      datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+                  - service: timer.cancel
+                    target:
+                      entity_id: !input quick_cool_timer
+                  - service: input_select.select_option
+                    target:
+                      entity_id: !input ac_mode
+                    data:
+                      option: "auto"
+                  # If inside window, activate session so thermostat takes over
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ in_time_window }}"
+                        sequence:
+                          - service: input_boolean.turn_on
+                            target:
+                              entity_id: !input session_active_flag
+
+              - conditions:
+                  - condition: template
+                    value_template: "{{ qc_humidity_reached and ac_consuming }}"
+                sequence:
+                  - service: switch.turn_off
+                    target:
+                      entity_id: !input ac_switch
+                  - service: input_datetime.set_datetime
+                    target:
+                      entity_id: !input last_off_helper
+                    data:
+                      datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+                  - service: timer.cancel
+                    target:
+                      entity_id: !input quick_cool_timer
+                  - service: input_select.select_option
+                    target:
+                      entity_id: !input ac_mode
+                    data:
+                      option: "auto"
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ in_time_window }}"
+                        sequence:
+                          - service: input_boolean.turn_on
+                            target:
+                              entity_id: !input session_active_flag
+
+              - conditions:
+                  - condition: template
+                    value_template: "{{ qc_temp_floor_hit and ac_consuming }}"
+                sequence:
+                  - service: switch.turn_off
+                    target:
+                      entity_id: !input ac_switch
+                  - service: input_datetime.set_datetime
+                    target:
+                      entity_id: !input last_off_helper
+                    data:
+                      datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+                  - service: timer.cancel
+                    target:
+                      entity_id: !input quick_cool_timer
+                  - service: input_select.select_option
+                    target:
+                      entity_id: !input ac_mode
+                    data:
+                      option: "auto"
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ in_time_window }}"
+                        sequence:
+                          - service: input_boolean.turn_on
+                            target:
+                              entity_id: !input session_active_flag
+
+              # ── Quick cool: AC turned off manually → cleanup ─
+              #   Guard with trigger.id == switch_off so that manually
+              #   setting mode to quick_cool via the dashboard doesn't
+              #   immediately revert back to auto just because the AC
+              #   switch happens to be off at that moment.
+              - conditions:
+                  - condition: template
+                    value_template: >
+                      {{ trigger.id == 'switch_off'
+                         and not is_state(ac_switch_entity, 'on') }}
+                sequence:
+                  - service: timer.cancel
+                    target:
+                      entity_id: !input quick_cool_timer
+                  - service: input_select.select_option
+                    target:
+                      entity_id: !input ac_mode
+                    data:
+                      option: "auto"
+
+      # ═══════════════════════════════════════════════════════
+      # PRIORITY 4b: Manual mode
+      #   Timer-based mode for sensorless rooms. Window ignored.
+      #   Reuses QC timer and duration. Only exits: timer expiry
+      #   (handled in timer-done block below), tap-off (switch_off
+      #   trigger), or genset (Priority 2).
+      #   Mode stays 'manual' — never auto-reverts.
+      # ═══════════════════════════════════════════════════════
+      - conditions:
+          - condition: template
+            value_template: "{{ mode == 'manual' and grid_stable }}"
+        sequence:
+          - choose:
+              # ── Timer expired or AC off → turn off ──────────
+              - conditions:
+                  - condition: template
+                    value_template: "{{ trigger.id == 'switch_off' }}"
+                sequence:
+                  - service: timer.cancel
+                    target:
+                      entity_id: !input quick_cool_timer
+
+      # ═══════════════════════════════════════════════════════
+      # PRIORITY 4c: Bypass mode — truly hands-off.
+      #   HA never touches the switch. No genset protection,
+      #   no restore, no timer. Empty sequence — falls through
+      #   without any action, preventing lower priorities from
+      #   acting on the AC.
+      # ═══════════════════════════════════════════════════════
+      - conditions:
+          - condition: template
+            value_template: "{{ mode == 'bypass' }}"
+        sequence: []
+
+      # ═══════════════════════════════════════════════════════
+      # PRIORITY 5: Auto mode
+      # KEY CHANGE: "turn ON" branch now requires session_active.
+      # Auto thermostat never self-starts without human intent.
+      # Manual tap-off inside window clears session (switch_off
+      # handler below).
+      # Window close clears session (window_close trigger).
+      # ═══════════════════════════════════════════════════════
+      - conditions:
+          - condition: template
+            value_template: "{{ mode == 'auto' and grid_stable }}"
+        sequence:
+          - choose:
+
+              # ── Force OFF outside schedule ───────────────────
+              - conditions:
+                  - condition: template
+                    value_template: "{{ not in_time_window and ac_consuming and not manual_switch_on }}"
+                sequence:
+                  - service: switch.turn_off
+                    target:
+                      entity_id: !input ac_switch
+                  - service: input_datetime.set_datetime
+                    target:
+                      entity_id: !input last_off_helper
+                    data:
+                      datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+
+              # ── Inside schedule: temp below target → OFF ─────
+              - conditions:
+                  - condition: template
+                    value_template: >
+                      {{ in_time_window and temp_available
+                         and temp <= target and ac_cooling }}
+                sequence:
+                  - service: switch.turn_off
+                    target:
+                      entity_id: !input ac_switch
+                  - service: input_datetime.set_datetime
+                    target:
+                      entity_id: !input last_off_helper
+                    data:
+                      datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+
+              # ── Inside schedule: temp above high → ON ────────
+              # REQUIRES session_active — thermostat never self-starts.
+              # session_active is set by: manual tap (Priority 0b) or
+              # QC expiry inside window (Priority 4 exit branches).
+              - conditions:
+                  - condition: template
+                    value_template: >
+                      {{ in_time_window and temp_available
+                         and temp >= high and not ac_consuming
+                         and off_elapsed >= min_off
+                         and session_active }}
+                sequence:
+                  - service: switch.turn_on
+                    target:
+                      entity_id: !input ac_switch
+
+  # ═══════════════════════════════════════════════════════════
+  # Quick cool timer finished
+  # FIX from v4: guarded by mode == 'quick_cool'.
+  # NEW in v5: if inside window, activates session after revert.
+  # ═══════════════════════════════════════════════════════════
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: quick_cool_timer_done
+          - condition: template
+            value_template: "{{ mode in ['quick_cool', 'manual'] }}"
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ ac_consuming }}"
+                sequence:
+                  - service: switch.turn_off
+                    target:
+                      entity_id: !input ac_switch
+                  - service: input_datetime.set_datetime
+                    target:
+                      entity_id: !input last_off_helper
+                    data:
+                      datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+          # QC reverts to auto; manual stays manual
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ mode == 'quick_cool' }}"
+                sequence:
+                  - service: input_select.select_option
+                    target:
+                      entity_id: !input ac_mode
+                    data:
+                      option: "auto"
+                  # If inside window, activate session so thermostat continues
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ in_time_window }}"
+                        sequence:
+                          - service: input_boolean.turn_on
+                            target:
+                              entity_id: !input session_active_flag
+              # manual mode: timer done → AC off, mode stays manual
+              - conditions:
+                  - condition: template
+                    value_template: "{{ mode == 'manual' }}"
+                sequence: []
+
+  # ═══════════════════════════════════════════════════════════
+  # Window close → clear session flag.
+  # Runs on the window_close time trigger.
+  # ═══════════════════════════════════════════════════════════
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: window_close
+        sequence:
+          - service: input_boolean.turn_off
+            target:
+              entity_id: !input session_active_flag
+
+  # ═══════════════════════════════════════════════════════════
+  # Manual tap-off inside window → clear session.
+  # If the user turns the AC off manually while a session is
+  # active inside the window, they are signalling "no more
+  # thermostat cycling". Clear the flag so auto won't restart.
+  # ═══════════════════════════════════════════════════════════
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: switch_off
+          - condition: template
+            value_template: "{{ in_time_window and session_active }}"
+        sequence:
+          - service: input_boolean.turn_off
+            target:
+              entity_id: !input session_active_flag
+
+  # ═══════════════════════════════════════════════════════════
+  # Safety: clear stale manual-intent flag.
+  # Unchanged from v4.
+  # ═══════════════════════════════════════════════════════════
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: switch_on
+          - condition: state
+            entity_id: !input manual_intent_flag
+            state: "on"
+        sequence:
+          - service: input_boolean.turn_off
+            target:
+              entity_id: !input manual_intent_flag

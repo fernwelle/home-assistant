@@ -1,0 +1,732 @@
+# ACBL v2 — Numeric helpers
+input_number:
+  ac_target_temp_v1_master:
+    name: "AC Target Temp — V1 Master"
+    min: 18
+    max: 30
+    step: 0.5
+    initial: 24.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-low
+
+  ac_high_temp_v1_master:
+    name: "AC ON Above — V1 Master"
+    min: 20
+    max: 38
+    step: 0.5
+    initial: 27.5
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-high
+
+  ac_min_off_v1_master:
+    name: "AC Min OFF — V1 Master"
+    min: 1
+    max: 15
+    step: 1
+    initial: 3
+    unit_of_measurement: "min"
+    icon: mdi:timer-sand
+
+  ac_qc_baseline_temp_v1_master:
+    name: "QC Baseline Temp — V1 Master"
+    min: 0
+    max: 55
+    step: 0.1
+    initial: 0
+    icon: mdi:thermometer-chevron-down
+
+  ac_qc_baseline_humidity_v1_master:
+    name: "QC Baseline Humidity — V1 Master"
+    min: 0
+    max: 100
+    step: 1
+    initial: 0
+    icon: mdi:water-percent
+
+  ac_target_temp_v1_raam:
+    name: "AC Target Temp — V1 Raam"
+    min: 18
+    max: 30
+    step: 0.5
+    initial: 24.5
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-low
+
+  ac_high_temp_v1_raam:
+    name: "AC ON Above — V1 Raam"
+    min: 20
+    max: 38
+    step: 0.5
+    initial: 27.5
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-high
+
+  ac_min_off_v1_raam:
+    name: "AC Min OFF — V1 Raam"
+    min: 1
+    max: 15
+    step: 1
+    initial: 3
+    unit_of_measurement: "min"
+    icon: mdi:timer-sand
+
+  ac_qc_baseline_temp_v1_raam:
+    name: "QC Baseline Temp — V1 Raam"
+    min: 0
+    max: 55
+    step: 0.1
+    initial: 0
+    icon: mdi:thermometer-chevron-down
+
+  ac_qc_baseline_humidity_v1_raam:
+    name: "QC Baseline Humidity — V1 Raam"
+    min: 0
+    max: 100
+    step: 1
+    initial: 0
+    icon: mdi:water-percent
+
+  ac_target_temp_v1_radhha:
+    name: "AC Target Temp — V1 Radhha"
+    min: 18
+    max: 30
+    step: 0.5
+    initial: 24.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-low
+
+  ac_high_temp_v1_radhha:
+    name: "AC ON Above — V1 Radhha"
+    min: 20
+    max: 38
+    step: 0.5
+    initial: 27.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-high
+
+  ac_min_off_v1_radhha:
+    name: "AC Min OFF — V1 Radhha"
+    min: 1
+    max: 15
+    step: 1
+    initial: 3
+    unit_of_measurement: "min"
+    icon: mdi:timer-sand
+
+  ac_qc_baseline_temp_v1_radhha:
+    name: "QC Baseline Temp — V1 Radhha"
+    min: 0
+    max: 55
+    step: 0.1
+    initial: 0
+    icon: mdi:thermometer-chevron-down
+
+  ac_qc_baseline_humidity_v1_radhha:
+    name: "QC Baseline Humidity — V1 Radhha"
+    min: 0
+    max: 100
+    step: 1
+    initial: 0
+    icon: mdi:water-percent
+
+  ac_target_temp_v1_yoga:
+    name: "AC Target Temp — V1 Yoga"
+    min: 18
+    max: 30
+    step: 0.5
+    initial: 24.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-low
+
+  ac_high_temp_v1_yoga:
+    name: "AC ON Above — V1 Yoga"
+    min: 20
+    max: 38
+    step: 0.5
+    initial: 26.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-high
+
+  ac_min_off_v1_yoga:
+    name: "AC Min OFF — V1 Yoga"
+    min: 1
+    max: 15
+    step: 1
+    initial: 3
+    unit_of_measurement: "min"
+    icon: mdi:timer-sand
+
+  ac_qc_baseline_temp_v1_yoga:
+    name: "QC Baseline Temp — V1 Yoga"
+    min: 0
+    max: 55
+    step: 0.1
+    initial: 0
+    icon: mdi:thermometer-chevron-down
+
+  ac_qc_baseline_humidity_v1_yoga:
+    name: "QC Baseline Humidity — V1 Yoga"
+    min: 0
+    max: 100
+    step: 1
+    initial: 0
+    icon: mdi:water-percent
+
+  ac_target_temp_v2_study:
+    name: "AC Target Temp — V2 Study"
+    min: 18
+    max: 30
+    step: 0.5
+    initial: 24.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-low
+
+  ac_high_temp_v2_study:
+    name: "AC ON Above — V2 Study"
+    min: 20
+    max: 38
+    step: 0.5
+    initial: 26.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-high
+
+  ac_min_off_v2_study:
+    name: "AC Min OFF — V2 Study"
+    min: 1
+    max: 15
+    step: 1
+    initial: 3
+    unit_of_measurement: "min"
+    icon: mdi:timer-sand
+
+  ac_qc_baseline_temp_v2_study:
+    name: "QC Baseline Temp — V2 Study"
+    min: 0
+    max: 55
+    step: 0.1
+    initial: 0
+    icon: mdi:thermometer-chevron-down
+
+  ac_qc_baseline_humidity_v2_study:
+    name: "QC Baseline Humidity — V2 Study"
+    min: 0
+    max: 100
+    step: 1
+    initial: 0
+    icon: mdi:water-percent
+
+  ac_target_temp_v2_sk:
+    name: "AC Target Temp — V2 SK"
+    min: 18
+    max: 30
+    step: 0.5
+    initial: 24.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-low
+
+  ac_high_temp_v2_sk:
+    name: "AC ON Above — V2 SK"
+    min: 20
+    max: 38
+    step: 0.5
+    initial: 26.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-high
+
+  ac_min_off_v2_sk:
+    name: "AC Min OFF — V2 SK"
+    min: 1
+    max: 15
+    step: 1
+    initial: 3
+    unit_of_measurement: "min"
+    icon: mdi:timer-sand
+
+  ac_qc_baseline_temp_v2_sk:
+    name: "QC Baseline Temp — V2 SK"
+    min: 0
+    max: 55
+    step: 0.1
+    initial: 0
+    icon: mdi:thermometer-chevron-down
+
+  ac_qc_baseline_humidity_v2_sk:
+    name: "QC Baseline Humidity — V2 SK"
+    min: 0
+    max: 100
+    step: 1
+    initial: 0
+    icon: mdi:water-percent
+
+  ac_target_temp_v2_ck:
+    name: "AC Target Temp — V2 CK"
+    min: 18
+    max: 30
+    step: 0.5
+    initial: 24.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-low
+
+  ac_high_temp_v2_ck:
+    name: "AC ON Above — V2 CK"
+    min: 20
+    max: 38
+    step: 0.5
+    initial: 26.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-high
+
+  ac_min_off_v2_ck:
+    name: "AC Min OFF — V2 CK"
+    min: 1
+    max: 15
+    step: 1
+    initial: 3
+    unit_of_measurement: "min"
+    icon: mdi:timer-sand
+
+  ac_qc_baseline_temp_v2_ck:
+    name: "QC Baseline Temp — V2 CK"
+    min: 0
+    max: 55
+    step: 0.1
+    initial: 0
+    icon: mdi:thermometer-chevron-down
+
+  ac_qc_baseline_humidity_v2_ck:
+    name: "QC Baseline Humidity — V2 CK"
+    min: 0
+    max: 100
+    step: 1
+    initial: 0
+    icon: mdi:water-percent
+
+  ac_target_temp_v3_master:
+    name: "AC Target Temp — V3 Master"
+    min: 18
+    max: 30
+    step: 0.5
+    initial: 24.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-low
+
+  ac_high_temp_v3_master:
+    name: "AC ON Above — V3 Master"
+    min: 20
+    max: 38
+    step: 0.5
+    initial: 26.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-high
+
+  ac_min_off_v3_master:
+    name: "AC Min OFF — V3 Master"
+    min: 1
+    max: 15
+    step: 1
+    initial: 3
+    unit_of_measurement: "min"
+    icon: mdi:timer-sand
+
+  ac_qc_baseline_temp_v3_master:
+    name: "QC Baseline Temp — V3 Master"
+    min: 0
+    max: 55
+    step: 0.1
+    initial: 0
+    icon: mdi:thermometer-chevron-down
+
+  ac_qc_baseline_humidity_v3_master:
+    name: "QC Baseline Humidity — V3 Master"
+    min: 0
+    max: 100
+    step: 1
+    initial: 0
+    icon: mdi:water-percent
+
+  ac_target_temp_v3_vrajraj:
+    name: "AC Target Temp — V3 Vrajraj"
+    min: 18
+    max: 30
+    step: 0.5
+    initial: 24.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-low
+
+  ac_high_temp_v3_vrajraj:
+    name: "AC ON Above — V3 Vrajraj"
+    min: 20
+    max: 38
+    step: 0.5
+    initial: 26.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-high
+
+  ac_min_off_v3_vrajraj:
+    name: "AC Min OFF — V3 Vrajraj"
+    min: 1
+    max: 15
+    step: 1
+    initial: 3
+    unit_of_measurement: "min"
+    icon: mdi:timer-sand
+
+  ac_qc_baseline_temp_v3_vrajraj:
+    name: "QC Baseline Temp — V3 Vrajraj"
+    min: 0
+    max: 55
+    step: 0.1
+    initial: 0
+    icon: mdi:thermometer-chevron-down
+
+  ac_qc_baseline_humidity_v3_vrajraj:
+    name: "QC Baseline Humidity — V3 Vrajraj"
+    min: 0
+    max: 100
+    step: 1
+    initial: 0
+    icon: mdi:water-percent
+
+  ac_target_temp_v3_dhaani:
+    name: "AC Target Temp — V3 Dhaani"
+    min: 18
+    max: 30
+    step: 0.5
+    initial: 24.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-low
+
+  ac_high_temp_v3_dhaani:
+    name: "AC ON Above — V3 Dhaani"
+    min: 20
+    max: 38
+    step: 0.5
+    initial: 26.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-high
+
+  ac_min_off_v3_dhaani:
+    name: "AC Min OFF — V3 Dhaani"
+    min: 1
+    max: 15
+    step: 1
+    initial: 3
+    unit_of_measurement: "min"
+    icon: mdi:timer-sand
+
+  ac_qc_baseline_temp_v3_dhaani:
+    name: "QC Baseline Temp — V3 Dhaani"
+    min: 0
+    max: 55
+    step: 0.1
+    initial: 0
+    icon: mdi:thermometer-chevron-down
+
+  ac_qc_baseline_humidity_v3_dhaani:
+    name: "QC Baseline Humidity — V3 Dhaani"
+    min: 0
+    max: 100
+    step: 1
+    initial: 0
+    icon: mdi:water-percent
+
+  ac_target_temp_v3_office:
+    name: "AC Target Temp — V3 Office"
+    min: 18
+    max: 30
+    step: 0.5
+    initial: 24.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-low
+
+  ac_high_temp_v3_office:
+    name: "AC ON Above — V3 Office"
+    min: 20
+    max: 38
+    step: 0.5
+    initial: 26.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-high
+
+  ac_min_off_v3_office:
+    name: "AC Min OFF — V3 Office"
+    min: 1
+    max: 15
+    step: 1
+    initial: 3
+    unit_of_measurement: "min"
+    icon: mdi:timer-sand
+
+  ac_qc_baseline_temp_v3_office:
+    name: "QC Baseline Temp — V3 Office"
+    min: 0
+    max: 55
+    step: 0.1
+    initial: 0
+    icon: mdi:thermometer-chevron-down
+
+  ac_qc_baseline_humidity_v3_office:
+    name: "QC Baseline Humidity — V3 Office"
+    min: 0
+    max: 100
+    step: 1
+    initial: 0
+    icon: mdi:water-percent
+
+  ac_target_temp_v4_dining_1:
+    name: "AC Target Temp — V4 Dining 1"
+    min: 18
+    max: 30
+    step: 0.5
+    initial: 24.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-low
+
+  ac_high_temp_v4_dining_1:
+    name: "AC ON Above — V4 Dining 1"
+    min: 20
+    max: 38
+    step: 0.5
+    initial: 26.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-high
+
+  ac_min_off_v4_dining_1:
+    name: "AC Min OFF — V4 Dining 1"
+    min: 1
+    max: 15
+    step: 1
+    initial: 5
+    unit_of_measurement: "min"
+    icon: mdi:timer-sand
+
+  ac_qc_baseline_temp_v4_dining_1:
+    name: "QC Baseline Temp — V4 Dining 1"
+    min: 0
+    max: 55
+    step: 0.1
+    initial: 0
+    icon: mdi:thermometer-chevron-down
+
+  ac_qc_baseline_humidity_v4_dining_1:
+    name: "QC Baseline Humidity — V4 Dining 1"
+    min: 0
+    max: 100
+    step: 1
+    initial: 0
+    icon: mdi:water-percent
+
+  ac_target_temp_v4_dining_2:
+    name: "AC Target Temp — V4 Dining 2"
+    min: 18
+    max: 30
+    step: 0.5
+    initial: 24.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-low
+
+  ac_high_temp_v4_dining_2:
+    name: "AC ON Above — V4 Dining 2"
+    min: 20
+    max: 38
+    step: 0.5
+    initial: 26.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-high
+
+  ac_min_off_v4_dining_2:
+    name: "AC Min OFF — V4 Dining 2"
+    min: 1
+    max: 15
+    step: 1
+    initial: 5
+    unit_of_measurement: "min"
+    icon: mdi:timer-sand
+
+  ac_qc_baseline_temp_v4_dining_2:
+    name: "QC Baseline Temp — V4 Dining 2"
+    min: 0
+    max: 55
+    step: 0.1
+    initial: 0
+    icon: mdi:thermometer-chevron-down
+
+  ac_qc_baseline_humidity_v4_dining_2:
+    name: "QC Baseline Humidity — V4 Dining 2"
+    min: 0
+    max: 100
+    step: 1
+    initial: 0
+    icon: mdi:water-percent
+
+  ac_target_temp_v4_living_1:
+    name: "AC Target Temp — V4 Living 1"
+    min: 18
+    max: 30
+    step: 0.5
+    initial: 24.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-low
+
+  ac_high_temp_v4_living_1:
+    name: "AC ON Above — V4 Living 1"
+    min: 20
+    max: 38
+    step: 0.5
+    initial: 26.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-high
+
+  ac_min_off_v4_living_1:
+    name: "AC Min OFF — V4 Living 1"
+    min: 1
+    max: 15
+    step: 1
+    initial: 5
+    unit_of_measurement: "min"
+    icon: mdi:timer-sand
+
+  ac_qc_baseline_temp_v4_living_1:
+    name: "QC Baseline Temp — V4 Living 1"
+    min: 0
+    max: 55
+    step: 0.1
+    initial: 0
+    icon: mdi:thermometer-chevron-down
+
+  ac_qc_baseline_humidity_v4_living_1:
+    name: "QC Baseline Humidity — V4 Living 1"
+    min: 0
+    max: 100
+    step: 1
+    initial: 0
+    icon: mdi:water-percent
+
+  ac_target_temp_v4_living_2:
+    name: "AC Target Temp — V4 Living 2"
+    min: 18
+    max: 30
+    step: 0.5
+    initial: 24.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-low
+
+  ac_high_temp_v4_living_2:
+    name: "AC ON Above — V4 Living 2"
+    min: 20
+    max: 38
+    step: 0.5
+    initial: 26.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-high
+
+  ac_min_off_v4_living_2:
+    name: "AC Min OFF — V4 Living 2"
+    min: 1
+    max: 15
+    step: 1
+    initial: 5
+    unit_of_measurement: "min"
+    icon: mdi:timer-sand
+
+  ac_qc_baseline_temp_v4_living_2:
+    name: "QC Baseline Temp — V4 Living 2"
+    min: 0
+    max: 55
+    step: 0.1
+    initial: 0
+    icon: mdi:thermometer-chevron-down
+
+  ac_qc_baseline_humidity_v4_living_2:
+    name: "QC Baseline Humidity — V4 Living 2"
+    min: 0
+    max: 100
+    step: 1
+    initial: 0
+    icon: mdi:water-percent
+
+  ac_target_temp_v4_guest:
+    name: "AC Target Temp — V4 Guest"
+    min: 18
+    max: 30
+    step: 0.5
+    initial: 24.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-low
+
+  ac_high_temp_v4_guest:
+    name: "AC ON Above — V4 Guest"
+    min: 20
+    max: 38
+    step: 0.5
+    initial: 26.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-high
+
+  ac_min_off_v4_guest:
+    name: "AC Min OFF — V4 Guest"
+    min: 1
+    max: 15
+    step: 1
+    initial: 3
+    unit_of_measurement: "min"
+    icon: mdi:timer-sand
+
+  ac_qc_baseline_temp_v4_guest:
+    name: "QC Baseline Temp — V4 Guest"
+    min: 0
+    max: 55
+    step: 0.1
+    initial: 0
+    icon: mdi:thermometer-chevron-down
+
+  ac_qc_baseline_humidity_v4_guest:
+    name: "QC Baseline Humidity — V4 Guest"
+    min: 0
+    max: 100
+    step: 1
+    initial: 0
+    icon: mdi:water-percent
+
+  ac_target_temp_v5_mandir:
+    name: "AC Target Temp — V5 Mandir"
+    min: 18
+    max: 30
+    step: 0.5
+    initial: 24.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-low
+
+  ac_high_temp_v5_mandir:
+    name: "AC ON Above — V5 Mandir"
+    min: 20
+    max: 38
+    step: 0.5
+    initial: 26.0
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-high
+
+  ac_min_off_v5_mandir:
+    name: "AC Min OFF — V5 Mandir"
+    min: 1
+    max: 15
+    step: 1
+    initial: 3
+    unit_of_measurement: "min"
+    icon: mdi:timer-sand
+
+  ac_qc_baseline_temp_v5_mandir:
+    name: "QC Baseline Temp — V5 Mandir"
+    min: 0
+    max: 55
+    step: 0.1
+    initial: 0
+    icon: mdi:thermometer-chevron-down
+
+  ac_qc_baseline_humidity_v5_mandir:
+    name: "QC Baseline Humidity — V5 Mandir"
+    min: 0
+    max: 100
+    step: 1
+    initial: 0
+    icon: mdi:water-percent

@@ -1,0 +1,154 @@
+# ACBL v2 — AC Mode selectors (auto / quick_cool / off)
+input_select:
+  ac_mode_v1_master:
+    name: "AC Mode — V1 Master"
+    options:
+      - auto
+      - quick_cool
+      - off
+    initial: auto
+    icon: mdi:thermostat
+
+  ac_mode_v1_raam:
+    name: "AC Mode — V1 Raam"
+    options:
+      - auto
+      - quick_cool
+      - off
+    initial: auto
+    icon: mdi:thermostat
+
+  ac_mode_v1_radhha:
+    name: "AC Mode — V1 Radhha"
+    options:
+      - auto
+      - quick_cool
+      - off
+    initial: auto
+    icon: mdi:thermostat
+
+  ac_mode_v1_yoga:
+    name: "AC Mode — V1 Yoga"
+    options:
+      - auto
+      - quick_cool
+      - off
+    initial: auto
+    icon: mdi:thermostat
+
+  ac_mode_v2_study:
+    name: "AC Mode — V2 Study"
+    options:
+      - auto
+      - quick_cool
+      - off
+    initial: auto
+    icon: mdi:thermostat
+
+  ac_mode_v2_sk:
+    name: "AC Mode — V2 SK"
+    options:
+      - auto
+      - quick_cool
+      - off
+    initial: auto
+    icon: mdi:thermostat
+
+  ac_mode_v2_ck:
+    name: "AC Mode — V2 CK"
+    options:
+      - auto
+      - quick_cool
+      - off
+    initial: auto
+    icon: mdi:thermostat
+
+  ac_mode_v3_master:
+    name: "AC Mode — V3 Master"
+    options:
+      - auto
+      - quick_cool
+      - off
+    initial: auto
+    icon: mdi:thermostat
+
+  ac_mode_v3_vrajraj:
+    name: "AC Mode — V3 Vrajraj"
+    options:
+      - auto
+      - quick_cool
+      - off
+    initial: auto
+    icon: mdi:thermostat
+
+  ac_mode_v3_dhaani:
+    name: "AC Mode — V3 Dhaani"
+    options:
+      - auto
+      - quick_cool
+      - off
+    initial: auto
+    icon: mdi:thermostat
+
+  ac_mode_v3_office:
+    name: "AC Mode — V3 Office"
+    options:
+      - auto
+      - quick_cool
+      - off
+    initial: auto
+    icon: mdi:thermostat
+
+  ac_mode_v4_dining_1:
+    name: "AC Mode — V4 Dining 1"
+    options:
+      - auto
+      - quick_cool
+      - off
+    initial: auto
+    icon: mdi:thermostat
+
+  ac_mode_v4_dining_2:
+    name: "AC Mode — V4 Dining 2"
+    options:
+      - auto
+      - quick_cool
+      - off
+    initial: auto
+    icon: mdi:thermostat
+
+  ac_mode_v4_living_1:
+    name: "AC Mode — V4 Living 1"
+    options:
+      - auto
+      - quick_cool
+      - off
+    initial: auto
+    icon: mdi:thermostat
+
+  ac_mode_v4_living_2:
+    name: "AC Mode — V4 Living 2"
+    options:
+      - auto
+      - quick_cool
+      - off
+    initial: auto
+    icon: mdi:thermostat
+
+  ac_mode_v4_guest:
+    name: "AC Mode — V4 Guest"
+    options:
+      - auto
+      - quick_cool
+      - off
+    initial: auto
+    icon: mdi:thermostat
+
+  ac_mode_v5_mandir:
+    name: "AC Mode — V5 Mandir"
+    options:
+      - auto
+      - quick_cool
+      - off
+    initial: auto
+    icon: mdi:thermostat
